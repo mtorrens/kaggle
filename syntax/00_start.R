@@ -15,9 +15,6 @@
 ################################################################################
 # Read command line arguments
 args <- commandArgs(trailingOnly = TRUE)
-if (length(args) == 0) { args <- NA }
-if (length(args) == 1) { args <- c(args, 'empty') }
-if (length(args) == 2) { args <- c(args, 'empty') }
 
 # Root path
 if (is.na(args[1]) || .Platform['OS.type'] != 'unix') {
@@ -64,7 +61,7 @@ check.version(dev.R = '3.2.2 x86_64')
 bs <- begin.script(script = paste('[', PROJECT, '] 00_start.R', sep = ''))
 
 # Packages needed
-load.packages(pkgs = c())
+load.packages(pkgs = c('class', 'randomForest', 'MASS', 'nnet', 'ggplot2'))
 
 # Stone parameters
 today <- format(Sys.time(), '%Y%m%d')
