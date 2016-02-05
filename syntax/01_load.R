@@ -1,4 +1,3 @@
-
 ################################################################################
 # Barcelona Graduate School of Economics
 # Master's Degree in Data Science
