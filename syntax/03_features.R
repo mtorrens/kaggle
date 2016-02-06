@@ -155,6 +155,9 @@ main.03 <- function() {
   np.train[, 'is_nov'] <- as.numeric(np.train[, 'month'] == '11')
   np.train[, 'is_dec'] <- as.numeric(np.train[, 'month'] == '12')
 
+  # Day
+  np.train[, 'day'] <- days
+
   # Season
   np.train[, 'season'] <- '4'  # Winter
   np.train[which(paste(month, days) > '03 20'), 'season'] <- '1'  # Spring
