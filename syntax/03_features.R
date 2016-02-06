@@ -189,16 +189,16 @@ main.03 <- function() {
   np.train[, 'day_avg_pop_lag1'] <- avg[m2]
   np.train[, 'day_sd_pop_lag1'] <- sds[m3]
 
-  m1 <- match(as.character(np.train[, 'date'] - 1), names(counts))
-  m2 <- match(as.character(np.train[, 'date'] - 1), names(avg))
-  m3 <- match(as.character(np.train[, 'date'] - 1), names(sds))
+  m1 <- match(as.character(np.train[, 'date'] - 2), names(counts))
+  m2 <- match(as.character(np.train[, 'date'] - 2), names(avg))
+  m3 <- match(as.character(np.train[, 'date'] - 2), names(sds))
   np.train[, 'day_news_lag2'] <- counts[m1]
   np.train[, 'day_avg_pop_lag2'] <- avg[m2]
   np.train[, 'day_sd_pop_lag2'] <- sds[m3]
 
-  m1 <- match(as.character(np.train[, 'date'] - 1), names(counts))
-  m2 <- match(as.character(np.train[, 'date'] - 1), names(avg))
-  m3 <- match(as.character(np.train[, 'date'] - 1), names(sds))
+  m1 <- match(as.character(np.train[, 'date'] - 3), names(counts))
+  m2 <- match(as.character(np.train[, 'date'] - 3), names(avg))
+  m3 <- match(as.character(np.train[, 'date'] - 3), names(sds))
   np.train[, 'day_news_lag3'] <- counts[m1]
   np.train[, 'day_avg_pop_lag3'] <- avg[m2]
   np.train[, 'day_sd_pop_lag3'] <- sds[m3]
