@@ -245,7 +245,8 @@ main.03 <- function() {
   # Save results
   file1 <- paste(DATADIR, 'final_variable_list.RData', sep = '')
   file2 <- paste(DATADIR, 'news_popularity_training_extended.RData', sep = '')
-  save(final.vars, file = file1); cat('Saved file:', file1, '\n')
+  save(final.vars, nat.vars, new.vars, std.cols, log.cols, file = file1)
+  cat('Saved file:', file1, '\n')
   save(np.train, file = file2); cat('Saved file:', file2, '\n')
 
   # End
