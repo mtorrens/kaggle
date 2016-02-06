@@ -212,7 +212,7 @@ main.03 <- function() {
                 'kw_avg_max_bin', 'kw_min_avg_bin', 'LDA_01_bin', 'LDA_02_bin',
                 'LDA_03_bin', 'LDA_04_bin', 'title_subjectivity_cat0',
                 'title_subjectivity_cat1', 'title_subjectivity_cat2',
-                'title_sentiment_polarity_cat0',
+                'is_outlier', 'title_sentiment_polarity_cat0',
                 'title_sentiment_polarity_cat1',
                 'title_sentiment_polarity_cat2', 'day_news', 'day_avg_pop',
                 'day_sd_pop', 'day_news_lag1', 'day_avg_pop_lag1',
