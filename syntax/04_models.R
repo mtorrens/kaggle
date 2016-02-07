@@ -46,7 +46,7 @@ main.04 <- function(lr = FALSE, k.nn = FALSE) {
   # Columns non-linearly independent
   cols.out <- c('weekday_is_wednesday', 'weekday_is_sunday',
                 'weekday_is_saturday', 'date', 'is_2013', 'is_2014',
-                'month', 'is_aug', 'is_jun' 'title_subjectivity_cat1',
+                'month', 'is_aug', 'is_jun', 'title_subjectivity_cat1',
                 'title_sentiment_polarity_cat2', 'n_tokens_title',
                 'n_tokens_content', 'kw_avg_min', 'kw_max_max',
                 'kw_min_avg')
@@ -61,56 +61,26 @@ main.04 <- function(lr = FALSE, k.nn = FALSE) {
 
   ##############################################################################
   # KNN
+  set.seed(666)
+  nt <- sample(1:nrow(np.train), floor(0.8 * nrow(np.train)))
+  ne <- (1:nrow(np.train))[! (1:nrow(np.train)) %in% nt]
+
+  # Run for different k's
   if (k.nn == TRUE) {
     new.varsT <- new.vars[new.vars != 'popularity']
     cl <- np.train[, 'popularity']
     train <- np.train[, new.varsT]
 
     # Optimize KNN parameters
-    if (FALSE) {
-      for (k in seq(1, 15, 2)) {
-        cat('Computing ', k, '-NN... ', sep = '')
-        preds <- knn(cl = cl, train = train, test = train, k = k)
-        tt <-  table(preds, cl)
-        assign(paste('tt', k, sep = ''), tt)
-        assign(paste('perc', k, sep = ''), sum(diag(tt)) / sum(tt))
-        cat('Done!\n')
-      }
-    }
-
-    set.seed(666)
-    new.cols <- new.varsT
-    #new.cols <- cols2[cols2 %in% colnames(train)]
-    nt <- sample(1:nrow(np.train), floor(0.8 * nrow(np.train)))
-    ne <- (1:nrow(np.train))[! (1:nrow(np.train)) %in% nt]
     for (k in seq(1, 55, 2)) {
       cat('Computing ', k, '-NN... ', sep = '')
-      preds <- knn(cl = cl[nt], train = train[nt, new.cols],
-                   test = train[ne, new.cols], k = k)
-      #preds <- knn(cl = cl[nt], train = train[nt, ], test = train[ne, ], k = k)
+      preds <- knn(cl = cl[nt], train = train[nt, new.varsT],
+                   test = train[ne, new.varsT], k = k)
       tt <-  table(preds, cl[ne])
       assign(paste('ttr', k, sep = ''), tt)
       assign(paste('percr', k, sep = ''), sum(diag(tt)) / sum(tt))  # 0.3941667
       cat('Done!\n')
     }
-
-    # # My K-NN
-    # source('~/Desktop/bgse/courses/term2/acm/problemSets/PS4/kNN.R')
-
-    # labs <- cl
-    # labs[ne] <- NA
-
-    # aa <- kNN(features = train, labels = labs, k = 3, p = 1, action = 'test')
-    # bb <- kNN(features = train, labels = labs, k = 3, p = 2, action = 'test')
-    # cc <- kNN(features = train, labels = labs, k = 3, p = Inf, action = 'test')
-
-    # sum(diag(table(aa[[1]][ne], cl[ne]))) / sum(table(aa[[1]][ne], cl[ne]))
-    # sum(diag(table(bb[[1]][ne], cl[ne]))) / sum(table(bb[[1]][ne], cl[ne]))
-    # sum(diag(table(cc[[1]][ne], cl[ne]))) / sum(table(cc[[1]][ne], cl[ne]))
-
-    # # # Mahalanobis
-    # # dists <- mahalanobis(train, colMeans(train), cov(train))
-    # # [...]
   }
   ##############################################################################
 
