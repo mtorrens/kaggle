@@ -61,7 +61,8 @@ check.version(dev.R = '3.2.2 x86_64')
 bs <- begin.script(script = paste('[', PROJECT, '] 00_start.R', sep = ''))
 
 # Packages needed
-load.packages(pkgs = c('class', 'randomForest', 'MASS', 'nnet', 'ggplot2'))
+load.packages(pkgs = c('class', 'randomForest', 'MASS', 'nnet', 'ggplot2',
+                       'foreach', 'doMC'))
 
 # Stone parameters
 today <- format(Sys.time(), '%Y%m%d')
