@@ -161,7 +161,8 @@ main.04 <- function(lr = FALSE, k.nn = FALSE) {
                                                                # 0.5307113
   
   # Optimize number of trees and node size                                                             
-  comb <- matrix(nrow = length(seq(200, 5000, 200)), ncol = seq(5, 50, 5))
+  comb <- matrix(nrow = length(seq(200, 5000, 200)),
+                 ncol = length(seq(5, 50, 5)))
   rownames(comb) <- seq(200, 5000, 200)
   colnames(comb) <- seq(5, 50, 5)
   for (n in seq(200, 5000, 200)) {
@@ -242,6 +243,3 @@ main.04 <- function(lr = FALSE, k.nn = FALSE) {
   end.script(begin = bs, end = Sys.time())
 }
 # END OF SCRIPT
-
-
-
