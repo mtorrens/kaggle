@@ -42,15 +42,22 @@ main.03 <- function() {
   # See if some observations can be considered outliers
   fives <- which(np.train[, 'popularity'] == 5)
   killed <- c()
+  extremes <- as.data.frame(matrix(ncol = 0, nrow = 2))
   for (col in nat.vars) {
     if (class(np.train[, col]) != 'character') {
       thres <- quantile(np.train[, col], probs = c(0.005, 0.995))
+      extremes <- cbind(extremes, as.data.frame(thres))
+      colnames(extremes)[ncol(extremes)] <- col
       #thres <- quantile(np.train[, col], probs = c(0.01, 0.99))
       outliers <- which(np.train[, col] < thres[1] | 
                         np.train[, col] > thres[2])
       killed <- unique(c(killed, outliers))
     }
   }
+
+  # Save thresholds
+  file <- paste(DATADIR, 'outlier_threshold.RData', sep = '')
+  save(extremes, file = file); cat('Saved file:', file, '\n')
 
   #killed <- killed[-which(killed %in% fives)]
   cat('Total number of observations:', nrow(np.train), '\n')
@@ -175,6 +182,9 @@ main.03 <- function() {
   avg <- tapply(np.train[, 'popularity'], np.train[, 'date'], mean)
   sds <- tapply(np.train[, 'popularity'], np.train[, 'date'], sd)
 
+  file <- paste(DATADIR, 'daily_scores.RData', sep = '')
+  save(counts, avg, sds, file = file); cat('Saved file:', file, '\n')
+
   m1 <- match(as.character(np.train[, 'date']), names(counts))
   m2 <- match(as.character(np.train[, 'date']), names(avg))
   m3 <- match(as.character(np.train[, 'date']), names(sds))
@@ -182,26 +192,26 @@ main.03 <- function() {
   np.train[, 'day_avg_pop'] <- avg[m2]
   np.train[, 'day_sd_pop'] <- sds[m3]
 
-  m1 <- match(as.character(np.train[, 'date'] - 1), names(counts))
-  m2 <- match(as.character(np.train[, 'date'] - 1), names(avg))
-  m3 <- match(as.character(np.train[, 'date'] - 1), names(sds))
-  np.train[, 'day_news_lag1'] <- counts[m1]
-  np.train[, 'day_avg_pop_lag1'] <- avg[m2]
-  np.train[, 'day_sd_pop_lag1'] <- sds[m3]
+  # m1 <- match(as.character(np.train[, 'date'] - 1), names(counts))
+  # m2 <- match(as.character(np.train[, 'date'] - 1), names(avg))
+  # m3 <- match(as.character(np.train[, 'date'] - 1), names(sds))
+  # np.train[, 'day_news_lag1'] <- counts[m1]
+  # np.train[, 'day_avg_pop_lag1'] <- avg[m2]
+  # np.train[, 'day_sd_pop_lag1'] <- sds[m3]
 
-  m1 <- match(as.character(np.train[, 'date'] - 2), names(counts))
-  m2 <- match(as.character(np.train[, 'date'] - 2), names(avg))
-  m3 <- match(as.character(np.train[, 'date'] - 2), names(sds))
-  np.train[, 'day_news_lag2'] <- counts[m1]
-  np.train[, 'day_avg_pop_lag2'] <- avg[m2]
-  np.train[, 'day_sd_pop_lag2'] <- sds[m3]
+  # m1 <- match(as.character(np.train[, 'date'] - 2), names(counts))
+  # m2 <- match(as.character(np.train[, 'date'] - 2), names(avg))
+  # m3 <- match(as.character(np.train[, 'date'] - 2), names(sds))
+  # np.train[, 'day_news_lag2'] <- counts[m1]
+  # np.train[, 'day_avg_pop_lag2'] <- avg[m2]
+  # np.train[, 'day_sd_pop_lag2'] <- sds[m3]
 
-  m1 <- match(as.character(np.train[, 'date'] - 3), names(counts))
-  m2 <- match(as.character(np.train[, 'date'] - 3), names(avg))
-  m3 <- match(as.character(np.train[, 'date'] - 3), names(sds))
-  np.train[, 'day_news_lag3'] <- counts[m1]
-  np.train[, 'day_avg_pop_lag3'] <- avg[m2]
-  np.train[, 'day_sd_pop_lag3'] <- sds[m3]
+  # m1 <- match(as.character(np.train[, 'date'] - 3), names(counts))
+  # m2 <- match(as.character(np.train[, 'date'] - 3), names(avg))
+  # m3 <- match(as.character(np.train[, 'date'] - 3), names(sds))
+  # np.train[, 'day_news_lag3'] <- counts[m1]
+  # np.train[, 'day_avg_pop_lag3'] <- avg[m2]
+  # np.train[, 'day_sd_pop_lag3'] <- sds[m3]
 
   # New variables
   new.vars <- c('date', 'since_20130101', 'year', 'month', 'day', 'is_2013',
@@ -215,10 +225,10 @@ main.03 <- function() {
                 'is_outlier', 'title_sentiment_polarity_cat0',
                 'title_sentiment_polarity_cat1',
                 'title_sentiment_polarity_cat2', 'day_news', 'day_avg_pop',
-                'day_sd_pop', 'day_news_lag1', 'day_avg_pop_lag1',
-                'day_sd_pop_lag1', 'day_news_lag2', 'day_avg_pop_lag2',
-                'day_sd_pop_lag2', 'day_news_lag3', 'day_avg_pop_lag3',
-                'day_sd_pop_lag3')
+                'day_sd_pop')#, 'day_news_lag1', 'day_avg_pop_lag1',
+                # 'day_sd_pop_lag1', 'day_news_lag2', 'day_avg_pop_lag2',
+                # 'day_sd_pop_lag2', 'day_news_lag3', 'day_avg_pop_lag3',
+                # 'day_sd_pop_lag3')
 
   # Standardized features
   std.vars <- c('n_tokens_title', 'n_tokens_content', 'kw_avg_min',
