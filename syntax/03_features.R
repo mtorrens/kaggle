@@ -24,6 +24,7 @@ main.03 <- function() {
   np.train <- get(load(file = file)); cat('Loaded file:', file, '\n')
 
   # Interesting original features (chosen by visual inspection from 02)
+  ori.vars <- colnames(np.train)[! colnames(np.train) %in% c('url', 'id')]
   nat.vars <- c('popularity', 'timedelta', 'n_tokens_title', 'n_tokens_content',
                 'num_hrefs', 'num_self_hrefs', 'num_imgs', 'num_videos',
                 'data_channel_is_lifestyle', 'data_channel_is_entertainment',
@@ -258,7 +259,8 @@ main.03 <- function() {
   # Save results
   file1 <- paste(DATADIR, 'final_variable_list.RData', sep = '')
   file2 <- paste(DATADIR, 'news_popularity_training_extended.RData', sep = '')
-  save(final.vars, nat.vars, new.vars, std.cols, log.cols, file = file1)
+  save(final.vars, nat.vars, new.vars, std.cols, log.cols, ori.vars,
+       file = file1)
   cat('Saved file:', file1, '\n')
   save(np.train, file = file2); cat('Saved file:', file2, '\n')
 

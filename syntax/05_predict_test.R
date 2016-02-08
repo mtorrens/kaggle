@@ -7,7 +7,7 @@
 # Script  : 05_predict_test.R
 ################################################################################
 # Author   : Miquel Torrens, 2016.02.07
-# Modified : -
+# Modified : Miquel Torrens, 2016.02.08
 ################################################################################
 # source('/Users/miquel/Desktop/bgse/projects/kaggle/syntax/00_start.R')
 # source(paste(SYNTAXDIR, '05_predict_test.R', sep = ''))
@@ -17,7 +17,7 @@
 main.05 <- function() {
 ################################################################################
   # Print starting time
-  bs <- begin.script(paste('[', PROJECT, '] 01_load.R', sep = ''))
+  bs <- begin.script(paste('[', PROJECT, '] 05_predict_test.R', sep = ''))
 
   ##############################################################################
   # Load
@@ -26,8 +26,8 @@ main.05 <- function() {
 
   # Training data
   file <- paste(DATADIR, 'news_popularity_training_extended.RData', sep = '')
-  np.train <- get(load(file = file)); cat('Loaded file:', file1, '\n')
-  load(file = file); cat('Loaded file:', file, '\n')
+  np.train <- get(load(file = file)); cat('Loaded file:', file, '\n')
+  #load(file = file); cat('Loaded file:', file, '\n')
 
   # Outlier threshold
   file <- paste(DATADIR, 'outlier_threshold.RData', sep = '')
@@ -223,25 +223,32 @@ main.05 <- function() {
   ##############################################################################
   # Run our best model
   # Prune NAs
-  np.test <- np.train[complete.cases(np.test), ]
+  np.test <- np.test[complete.cases(np.test), ]
   np.train <- np.train[complete.cases(np.train), ]
   final.vars <- unique(c('popularity', final.vars))
 
   # Random Forest
+  cat('Callibrating model... ')
   final.varsT <- final.vars[final.vars != 'popularity']
+  set.seed(666)
   rf <- randomForest(y = as.factor(np.train[, 'popularity']),
                      x = np.train[, final.varsT],
-                     ntree = 1000, nodesize = 25)
+                     ntree = 1200, nodesize = 10)
+  # rf <- randomForest(y = as.factor(np.train[, 'popularity']),
+  #                    x = np.train[, final.varsT],
+  #                    ntree = 1000, nodesize = 25)
+  cat('Done!\n')
 
   # Predictions
-  preds <- predict(rf, new.data = np.test)
+  preds <- predict(rf, newdata = np.test)
   result <- cbind(np.test[, 'id'], preds)
   colnames(result) <- c('id', 'popularity')
 
   # Save the results in the correct format
-  now  <- format(Sys.time(), '%Y%m%d_%H%M')
+  now <- format(Sys.time(), '%Y%m%d_%H%M')
   file <- paste(OUTPUTDIR, 'res_', now, '.csv', sep = '')
   write.csv(result, file = file, row.names = FALSE)
+  cat('Written file:', file, '\n')
   ##############################################################################
 
   # End
