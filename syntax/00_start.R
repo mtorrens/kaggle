@@ -18,7 +18,10 @@ args <- commandArgs(trailingOnly = TRUE)
 
 # Root path
 if (is.na(args[1]) || .Platform['OS.type'] != 'unix') {
-  PATH <- '/Users/miquel/Desktop/bgse/projects/kaggle/'
+  PATH <- '/Users/miquel/Desktop/bgse/projects/kaggle/'  # Miquel
+  if (.Platform['OS.type'] == 'windows') {
+    PATH <- 'C:/OneDrive/BGSE/GitHub/kaggle/'  # Matthew
+  }
   #PATH <- '/home/ubuntu/project/'
 } else {
   PATH <- paste(system(toString(args[1]), intern = TRUE), '/', sep = '')
