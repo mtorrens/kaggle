@@ -15,7 +15,7 @@
 
 ################################################################################
 main.04 <- function(lr = FALSE, k.nn = FALSE, svmac = FALSE, nn = FALSE,
-                    do.optimize = FALSE, ncores = 3) {
+                    olreg = FALSE, do.optimize = FALSE, ncores = 3) {
 ################################################################################
   # Print starting time
   bs <- begin.script(paste('[', PROJECT, '] 03_features.R', sep = ''))

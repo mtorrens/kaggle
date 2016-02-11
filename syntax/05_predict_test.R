@@ -225,19 +225,22 @@ main.05 <- function() {
   # Prune NAs
   np.test <- np.test[complete.cases(np.test), ]
   np.train <- np.train[complete.cases(np.train), ]
-  final.vars <- unique(c('popularity', final.vars))
+  final.vars <- unique(c('popularity', final.vars, ori.vars))
+  #final.vars <- unique(c('popularity', final.vars))
 
   # Random Forest
   cat('Callibrating model... ')
   final.varsT <- final.vars[final.vars != 'popularity']
-  set.seed(666)
+  ntrees <- 1200
+  nodes <- 10
+  seed <- 2950
+  # 1. n = 100, s = 65, seed = 2100 EST FINAL: 0.5299 (final + original)
+  # 2. n = 1200, s = 10, seed = 666 EST FINAL: 0.5289 (final)
+  set.seed(seed)
   rf <- randomForest(y = as.factor(np.train[, 'popularity']),
                      x = np.train[, final.varsT],
-                     ntree = 1200, nodesize = 10)
-  # rf <- randomForest(y = as.factor(np.train[, 'popularity']),
-  #                    x = np.train[, final.varsT],
-  #                    ntree = 1000, nodesize = 25)
-  cat('Done!\n')
+                     ntree = ntrees, nodesize = nodes)
+  cat('Done!\nnt: ', ntrees, ', ns: ', nodes, ', s: ', seed, '\n', sep = '')
 
   # Predictions
   preds <- predict(rf, newdata = np.test)
