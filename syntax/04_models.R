@@ -36,7 +36,7 @@ main.04 <- function(lr = FALSE, k.nn = FALSE, svmac = FALSE, nn = FALSE,
   }
   
   ##############################################################################
-  # Baseline linear regression to see important features
+  # Baseline linear regression to see important features
   if (lr == TRUE) {
     cat('Running baseline Linear Regression... ')
     m01 <- lm(popularity ~ ., data = np.train[, final.vars])
@@ -61,16 +61,17 @@ main.04 <- function(lr = FALSE, k.nn = FALSE, svmac = FALSE, nn = FALSE,
   ##############################################################################
 
   ##############################################################################
-  # KNN
+  # KNN
   set.seed(666)
   nt <- sample(1:nrow(np.train), floor(0.8 * nrow(np.train)))
   ne <- (1:nrow(np.train))[! (1:nrow(np.train)) %in% nt]
 
+  new.varsT <- new.vars[new.vars != 'popularity']
+  cl <- np.train[, 'popularity']
+  train <- np.train[, new.varsT]
+
   # Run for different k's
-  if (k.nn == TRUE) {
-    new.varsT <- new.vars[new.vars != 'popularity']
-    cl <- np.train[, 'popularity']
-    train <- np.train[, new.varsT]
+  if (k.nn == TRUE) {
 
     # Optimize KNN parameters
     for (k in seq(1, 55, 2)) {
@@ -132,7 +133,7 @@ main.04 <- function(lr = FALSE, k.nn = FALSE, svmac = FALSE, nn = FALSE,
   tt <- table(preds, cl[ne])
   res <- sum(diag(tt)) / sum(tt)
 
-  # Optimize parameters of the Random Forest
+  # Optimize parameters of the Random Forest
   if (do.optimize == TRUE) {
     res <- matrix(nrow = 0, ncol = 3)
     colnames(res) <- c('ntrees', 'nodesize', 'accuracy')
@@ -152,7 +153,7 @@ main.04 <- function(lr = FALSE, k.nn = FALSE, svmac = FALSE, nn = FALSE,
         tt <- table(preds, cl[ne])
         acc <- sum(diag(tt)) / sum(tt)
 
-        # Finish
+        # Finish
         cat('n:', n, 's:', s, 'acc:', round(acc, 4), '\n')
         return(c(n, s, acc))
       }
@@ -191,7 +192,7 @@ main.04 <- function(lr = FALSE, k.nn = FALSE, svmac = FALSE, nn = FALSE,
       tt <- table(preds, cl[ne])
       acc <- sum(diag(tt)) / sum(tt)
 
-      # Finish
+      # Finish
       cat('seed', seed, 'acc:', round(acc, 4), '\n')
       return(c(seed, acc))
     }
@@ -240,11 +241,11 @@ main.04 <- function(lr = FALSE, k.nn = FALSE, svmac = FALSE, nn = FALSE,
   ##############################################################################
 
   ##############################################################################
-  # SVM
+  # SVM
   if (svmac == TRUE) {
     library(e1071)
 
-    # Model
+    # Model
     form <- as.formula(as.factor(popularity) ~ .)
     msvm <- svm(form, data = np.train[nt, final.vars], kernel = 'radial')
 
@@ -263,7 +264,7 @@ main.04 <- function(lr = FALSE, k.nn = FALSE, svmac = FALSE, nn = FALSE,
     # Run model
     mab <- maboost(as.factor(popularity) ~ ., data = np.train[nt, final.vars])
 
-    # Predictions
+    # Predictions
     preds <- predict(mab, newdata = np.train[ne, final.vars])
 
     # Check accuracy
@@ -276,12 +277,12 @@ main.04 <- function(lr = FALSE, k.nn = FALSE, svmac = FALSE, nn = FALSE,
   # SGD
   library(sgd)
 
-  # Model
+  # Model
   msgd <- sgd(as.factor(popularity) ~ ., data = np.train[nt, final.vars],
               model = 'glm', model.control = list(family = 'binomial'),
               sgd.control = list(npasses = 3, pass = TRUE, shuffle = FALSE))
 
-  # # Predictions
+  # # Predictions
   # num.np.test <- np.train[ne, final.varsT]
   # for (col in 1:ncol(num.np.test)) {
   #   num.np.test[, col] <- as.numeric(num.np.test[, col])
@@ -295,7 +296,7 @@ main.04 <- function(lr = FALSE, k.nn = FALSE, svmac = FALSE, nn = FALSE,
 
   ##############################################################################
   # Neural networks
-  # Model
+  # Model
   if (nn == TRUE) {
     library(nnet)
     library(neuralnet)
@@ -327,10 +328,10 @@ main.04 <- function(lr = FALSE, k.nn = FALSE, svmac = FALSE, nn = FALSE,
   # Random Forest (RF)
   # Adaptive Boosting (AdaBoost)
   # SVM with a Radial Basis Function (RBF) kernel
-  # K-Nearest Neighbors (KNN) 
-  # Naive Bayes (NB)
+  # K-Nearest Neighbors (KNN) 
+  # Naive Bayes (NB)
 
   # End
   end.script(begin = bs, end = Sys.time())
 }
-# END OF SCRIPT
+# END OF SCRIPT
