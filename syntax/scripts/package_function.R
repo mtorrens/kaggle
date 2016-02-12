@@ -79,22 +79,22 @@ onp.predict <- function(train, test, verbose = TRUE, store = FALSE,
   killed <- c()
   extremes <- as.data.frame(matrix(ncol = 0, nrow = 2))
   for (col in nat.vars) {
-    if (class(np.train[, col]) != 'character') {
+    if (class(train[, col]) != 'character') {
       # Those in the tails of the distributions may be considered outliers
-      thres <- quantile(np.train[, col], probs = c(0.005, 0.995))
+      thres <- quantile(train[, col], probs = c(0.005, 0.995))
       extremes <- cbind(extremes, as.data.frame(thres))
       colnames(extremes)[ncol(extremes)] <- col
       
       # Only those stricly outside interval (in case of high concentration)
-      outliers <- which(np.train[, col] < thres[1] | 
-                        np.train[, col] > thres[2])
+      outliers <- which(train[, col] < thres[1] | 
+                        train[, col] > thres[2])
       killed <- unique(c(killed, outliers))
     }
   }
 
   # Report the results
   if (verbose == TRUE) {
-    cat('Total number of observations ("train"):', nrow(np.train), '\n')
+    cat('Total number of observations ("train"):', nrow(train), '\n')
     cat('Number of outliers detected ("train"):', length(killed), '\n')
   }
 
