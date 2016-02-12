@@ -233,7 +233,7 @@ main.05 <- function() {
   final.varsT <- final.vars[final.vars != 'popularity']
   ntrees <- 1200
   nodes <- 10
-  seed <- 2950
+  seed <- 3050
   # 1. n = 100, s = 65, seed = 2100 EST FINAL: 0.5299 (final + original)
   # 2. n = 1200, s = 10, seed = 666 EST FINAL: 0.5289 (final)
   set.seed(seed)
