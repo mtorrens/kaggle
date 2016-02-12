@@ -420,7 +420,7 @@ onp.predict <- function(train, test, verbose = TRUE, store = FALSE,
 
   # Save the results in the correct format
   if (store == TRUE) {
-    end.path <- ifelse(! is.null(dest.folder), dest.path, getwd())
+    end.path <- ifelse(! is.null(dest.folder), dest.folder, getwd())
     if (! grepl('/$', end.path)) { end.path <- paste(end.path, '/', sep = '') }
     now <- format(Sys.time(), '%Y%m%d_%H%M')
     file <- paste(end.path, 'res_', now, '.csv', sep = '')
