@@ -13,16 +13,6 @@
 # source(paste(SCRIPTSDIR, 'package_function.R', sep = ''))
 ################################################################################
 
-if (FALSE) {
-  file <- paste(DATADIR, 'news_popularity_training.RData', sep = '')
-  train <- get(load(file = file)); cat('Loaded file:', file, '\n')
-  file <- paste(DATADIR, 'news_popularity_test.RData', sep = '')
-  test <- get(load(file = file)); cat('Loaded file:', file, '\n')
-
-  preds <- onp.predict(train, test)
-  head(preds)
-}
-
 ################################################################################
 onp.predict <- function(train, test, verbose = TRUE, store = FALSE,
                         dest.folder = NULL, visible = TRUE, ntree = NA,
