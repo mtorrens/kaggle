@@ -15,10 +15,19 @@
 
 ################################################################################
 main.04 <- function(lr = FALSE, k.nn = FALSE, svmac = FALSE, nn = FALSE,
-                    olreg = FALSE, do.optimize = FALSE, ncores = 3) {
+                    olreg = FALSE, linda = FALSE, mnomial = FALSE,
+                    stocgd = FALSE, do.optimize = FALSE, ncores = 3) {
 ################################################################################
   # Print starting time
   bs <- begin.script(paste('[', PROJECT, '] 03_features.R', sep = ''))
+
+  ##############################################################################
+  # Random Forest (RF)
+  # Adaptive Boosting (AdaBoost)
+  # SVM with a Radial Basis Function (RBF) kernel
+  # K-Nearest Neighbors (KNN) 
+  # Naive Bayes (NB)
+  ##############################################################################
 
   # Load data
   file1 <- paste(DATADIR, 'news_popularity_training_extended.RData', sep = '')
@@ -66,14 +75,14 @@ main.04 <- function(lr = FALSE, k.nn = FALSE, svmac = FALSE, nn = FALSE,
   nt <- sample(1:nrow(np.train), floor(0.8 * nrow(np.train)))
   ne <- (1:nrow(np.train))[! (1:nrow(np.train)) %in% nt]
 
+  # Define test and training sets
   new.varsT <- new.vars[new.vars != 'popularity']
   cl <- np.train[, 'popularity']
-  train <- np.train[, new.varsT]
 
   # Run for different k's
   if (k.nn == TRUE) {
-
     # Optimize KNN parameters
+    train <- np.train[, new.varsT]
     for (k in seq(1, 55, 2)) {
       cat('Computing ', k, '-NN... ', sep = '')
       preds <- knn(cl = cl[nt], train = train[nt, new.varsT],
@@ -205,39 +214,44 @@ main.04 <- function(lr = FALSE, k.nn = FALSE, svmac = FALSE, nn = FALSE,
     save(res, file = paste(TEMPDIR, 'optimal_seed.RData', sep = ''))
     cat('Saved file:', paste(TEMPDIR, 'optimal_seed.RData', sep = ''), '\n')
   }
-
   ##############################################################################
 
   ##############################################################################
   # LDA
-  cols4 <- c('popularity', 'timedelta', 'n_tokens_title', 'n_tokens_content',
-             'num_hrefs', 'num_self_hrefs', 'num_imgs', 'num_videos',
-             'data_channel_is_lifestyle', 'data_channel_is_entertainment',
-             'data_channel_is_bus', 'data_channel_is_socmed',
-             'data_channel_is_tech', 'data_channel_is_world', 'kw_min_min',
-             'kw_min_max', 'kw_avg_max', 'kw_min_avg', 'kw_max_avg', 'kw_avg_avg',
-             'self_reference_min_shares', 'self_reference_max_shares',
-             'self_reference_avg_sharess', 'weekday_is_monday',
-             'weekday_is_tuesday', 'weekday_is_wednesday', 'weekday_is_thursday',
-             'weekday_is_friday', 'LDA_01', 'LDA_02', 'LDA_03',
-             'LDA_04', 'title_subjectivity', 'title_sentiment_polarity',
-             'timedelta_bin', 'kw_min_min_cat0', 'kw_avg_max_bin', 'LDA_01_bin',
-             'LDA_02_bin', 'LDA_03_bin', 'LDA_04_bin', 'title_subjectivity_cat1',
-             'title_subjectivity_cat2', 'title_sentiment_polarity_cat1',
-             'title_sentiment_polarity_cat2')
-  
-  cm <- cor(np.train[nt, cols3])
-  da <- lda(popularity ~ ., data = np.train[nt, cols4])
-  res <- predict(da, newdata = np.train[ne, ])
-  preds <- res$class
-  sum(diag(table(preds, cl[ne]))) / sum(table(preds, cl[ne]))  # 51%
+  if (linda == TRUE) {
+    cols4 <- c('popularity', 'timedelta', 'n_tokens_title', 'n_tokens_content',
+               'num_hrefs', 'num_self_hrefs', 'num_imgs', 'num_videos',
+               'data_channel_is_lifestyle', 'data_channel_is_entertainment',
+               'data_channel_is_bus', 'data_channel_is_socmed',
+               'data_channel_is_tech', 'data_channel_is_world', 'kw_min_min',
+               'kw_min_max', 'kw_avg_max', 'kw_min_avg', 'kw_max_avg',
+               'kw_avg_avg', 'self_reference_min_shares',
+               'self_reference_max_shares', 'self_reference_avg_sharess',
+               'weekday_is_monday', 'weekday_is_tuesday',
+               'weekday_is_wednesday', 'weekday_is_thursday',
+               'weekday_is_friday', 'LDA_01', 'LDA_02', 'LDA_03',
+               'LDA_04', 'title_subjectivity', 'title_sentiment_polarity',
+               'timedelta_bin', 'kw_min_min_cat0', 'kw_avg_max_bin',
+               'LDA_01_bin', 'LDA_02_bin', 'LDA_03_bin', 'LDA_04_bin',
+               'title_subjectivity_cat1', 'title_subjectivity_cat2',
+               'title_sentiment_polarity_cat1',
+               'title_sentiment_polarity_cat2')
+    
+    cm <- cor(np.train[nt, cols3])
+    da <- lda(popularity ~ ., data = np.train[nt, cols4])
+    res <- predict(da, newdata = np.train[ne, ])
+    preds <- res$class
+    sum(diag(table(preds, cl[ne]))) / sum(table(preds, cl[ne]))  # 51%
+  }
   ##############################################################################
 
   ##############################################################################
   # Multinomial logit
-  mn <- multinom(popularity ~ ., data = np.train[nt, cols3])
-  preds <- predict(mn, newdata = np.train[ne, ])
-  sum(diag(table(preds, cl[ne]))) / sum(table(preds, cl[ne]))
+  if (mnomial == TRUE) {
+    mn <- multinom(popularity ~ ., data = np.train[nt, cols3])
+    preds <- predict(mn, newdata = np.train[ne, ])
+    sum(diag(table(preds, cl[ne]))) / sum(table(preds, cl[ne]))
+  }
   ##############################################################################
 
   ##############################################################################
@@ -275,23 +289,25 @@ main.04 <- function(lr = FALSE, k.nn = FALSE, svmac = FALSE, nn = FALSE,
 
   ##############################################################################
   # SGD
-  library(sgd)
+  if (stocgd == TRUE) {
+    library(sgd)
 
-  # Model
-  msgd <- sgd(as.factor(popularity) ~ ., data = np.train[nt, final.vars],
-              model = 'glm', model.control = list(family = 'binomial'),
-              sgd.control = list(npasses = 3, pass = TRUE, shuffle = FALSE))
+    # Model
+    msgd <- sgd(as.factor(popularity) ~ ., data = np.train[nt, final.vars],
+                model = 'glm', model.control = list(family = 'binomial'),
+                sgd.control = list(npasses = 3, pass = TRUE, shuffle = FALSE))
 
-  # # Predictions
-  # num.np.test <- np.train[ne, final.varsT]
-  # for (col in 1:ncol(num.np.test)) {
-  #   num.np.test[, col] <- as.numeric(num.np.test[, col])
-  # }
-  # preds <- predict(msgd, x_test = num.np.test)
+    # # Predictions
+    # num.np.test <- np.train[ne, final.varsT]
+    # for (col in 1:ncol(num.np.test)) {
+    #   num.np.test[, col] <- as.numeric(num.np.test[, col])
+    # }
+    # preds <- predict(msgd, x_test = num.np.test)
 
-  # # Check accuracy
-  # tt <- table(preds, cl[ne])
-  # acc <- sum(diag(tt)) / sum(tt)
+    # # Check accuracy
+    # tt <- table(preds, cl[ne])
+    # acc <- sum(diag(tt)) / sum(tt)
+  }
   ##############################################################################
 
   ##############################################################################
@@ -324,12 +340,6 @@ main.04 <- function(lr = FALSE, k.nn = FALSE, svmac = FALSE, nn = FALSE,
     acc <- sum(diag(tt)) / sum(tt)
   }
   ##############################################################################
-
-  # Random Forest (RF)
-  # Adaptive Boosting (AdaBoost)
-  # SVM with a Radial Basis Function (RBF) kernel
-  # K-Nearest Neighbors (KNN) 
-  # Naive Bayes (NB)
 
   # End
   end.script(begin = bs, end = Sys.time())
