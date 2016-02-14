@@ -4,17 +4,11 @@
 ################################################################################
 # Course  : Advanced Computational Methods
 # Project : Kaggle Competition
+# Group   : The Unlikelies
 # Script  : package_function.R
 ################################################################################
-# Author   : Miquel Torrens, 2016.02.12
-# Modified : -
-################################################################################
-# source('/Users/miquel/Desktop/bgse/projects/kaggle/syntax/00_start.R')
-# source(paste(SCRIPTSDIR, 'package_function.R', sep = ''))
-################################################################################
 
 ################################################################################
-
 #' onp.predict
 #'
 #' Use features, outlier detection, and hyperparameter optimization brought to
@@ -29,6 +23,7 @@
 #' permission by the authors.
 #' 
 #' @param test A data frame containing a test set with 61 features.
+#' @param train An optional data frame containing a training set with 62 features.  If not provided, a default internal training set is used.
 #' @param verbose TRUE if the function should print progress.
 #' @param store TRUE if the resulting predictions should be saved to a CSV file.
 #' @param dest.folder Folder in which the results will be saved.
@@ -39,31 +34,11 @@
 #' @param ... Additional parameters to the model generator randomForest().
 #' 
 #' @export
-onp.predict <- function(test, verbose = TRUE, store = FALSE,
+onp.predict <- function(test, train = NULL, verbose = TRUE, store = FALSE,
                         dest.folder = NULL, visible = TRUE, ntree = NA,
                         nodesize = NA, seed = NA, ...) {
-################################################################################
-# The Unlikelies (c) 2016.02.12
-# Authors: Roger Cusco, Matthew Sudmann-Day, Miquel Torrens
-#
-# DISCLAIMER: Evaluator's eyes only. This function contains confidential
-# procedures for the Kaggle competition results and must not be released or
-# displayed to third parties under any circumstance without express written
-# permission by the authors.
-#
-# Arguments :
-#  train (data.frame) : training test with 61 features plus predicted feature
-#  test  (data.frame) : testing test with 61 features
-#  verbose  (logical) : TRUE if the function should print progress
-#  store    (logical) : TRUE if the resulting predictions should be saved (csv)
-#  dest.folder (char) : folder in which the results will be saved
-#  visible  (logical) : TRUE if the results should be visible when returned
-#  ntrees   (numeric) : number of trees for the Random Forest
-#  nodesize (numeric) : end nodesize for the Random Forest
-#  seed     (numeric) : starting seed for the Random Forest
-#  ...                : other arguments to be passed to the Random Forest
-################################################################################
-  # Required packages
+
+    # Required packages
   if (! require(randomForest)) {
     stop('required package not installed: "randomForest"')
   } else {
@@ -72,8 +47,10 @@ onp.predict <- function(test, verbose = TRUE, store = FALSE,
     }    
   }
 
-  train <- np.train; np.train <- NULL
-  
+  if (is.null(train)) {
+    train <- np.train
+  }
+
   # Assert features
   if (ncol(train) != 62) {
     stop('"train" set does not have the correct amount of features (62).')
@@ -83,7 +60,7 @@ onp.predict <- function(test, verbose = TRUE, store = FALSE,
   }
 
   ##############################################################################
-  # Training set
+  # Training set
   ##############################################################################
   # Define interesting original variables
   ori.vars <- colnames(train)[! colnames(train) %in% c('url', 'id')]
@@ -102,7 +79,7 @@ onp.predict <- function(test, verbose = TRUE, store = FALSE,
                 'LDA_01', 'LDA_02', 'LDA_03', 'LDA_04', 'title_subjectivity',
                 'title_sentiment_polarity', 'abs_title_sentiment_polarity')
 
-  # See if some observations can be considered outliers
+  # See if some observations can be considered outliers
   killed <- c()
   extremes <- as.data.frame(matrix(ncol = 0, nrow = 2))
   for (col in nat.vars) {
@@ -125,7 +102,7 @@ onp.predict <- function(test, verbose = TRUE, store = FALSE,
     cat('Number of outliers detected ("train"):', length(killed), '\n')
   }
 
-  # Creating new variables
+  # Creating new variables
   # Binary for outliers
   train[, 'is_outlier'] <- 0
   train[killed, 'is_outlier'] <- 1
@@ -146,10 +123,10 @@ onp.predict <- function(test, verbose = TRUE, store = FALSE,
   # Binary kw_avg_max
   train[, 'kw_avg_max_bin'] <- as.numeric(train[, 'kw_avg_max'] >= 1e5)
 
-  # Binary kw_min_avg
+  # Binary kw_min_avg
   train[, 'kw_min_avg_bin'] <- as.numeric(train[, 'kw_min_avg'] >= 0)
 
-  # Binary LDA_0x
+  # Binary LDA_0x
   train[, 'LDA_01_bin'] <- as.numeric(train[, 'LDA_01'] < 0.1)
   train[, 'LDA_02_bin'] <- as.numeric(train[, 'LDA_02'] < 0.1)
   train[, 'LDA_03_bin'] <- as.numeric(train[, 'LDA_03'] < 0.1)
@@ -159,7 +136,7 @@ onp.predict <- function(test, verbose = TRUE, store = FALSE,
   train[, 'LDA_03_bin_int'] <- train[, 'LDA_03'] * train[, 'LDA_03_bin']
   train[, 'LDA_04_bin_int'] <- train[, 'LDA_04'] * train[, 'LDA_04_bin']
 
-  # Categorical title_subjectivity
+  # Categorical title_subjectivity
   q0 <- which(train[, 'title_subjectivity'] <  0.15)
   q1 <- which(train[, 'title_subjectivity'] >= 0.15)
   q2 <- which(train[, 'title_subjectivity'] >= 0.6)
@@ -188,7 +165,7 @@ onp.predict <- function(test, verbose = TRUE, store = FALSE,
   month <- sapply(urls, `[`, 5)
   dates <- paste(years, month, days, sep = '-')
 
-  # Date
+  # Date
   day.one <- as.Date('2013-01-01', '%Y-%m-%d')
   train[, 'date'] <- as.Date(dates, '%Y-%m-%d')
   train[, 'since_20130101'] <- as.numeric(train[, 'date'] - day.one)
@@ -218,10 +195,10 @@ onp.predict <- function(test, verbose = TRUE, store = FALSE,
 
   # Season
   train[, 'season'] <- '4'  # Winter
-  train[which(paste(month, days) > '03 20'), 'season'] <- '1'  # Spring
+  train[which(paste(month, days) > '03 20'), 'season'] <- '1'  # Spring
   train[which(paste(month, days) > '06 20'), 'season'] <- '2'  # Summer
   train[which(paste(month, days) > '09 20'), 'season'] <- '3'  # Autumn
-  train[which(paste(month, days) > '12 20'), 'season'] <- '4'  # Winter
+  train[which(paste(month, days) > '12 20'), 'season'] <- '4'  # Winter
   train[, 'is_spring'] <- as.numeric(train[, 'season'] == '1')
   train[, 'is_summer'] <- as.numeric(train[, 'season'] == '2')
   train[, 'is_autumn'] <- as.numeric(train[, 'season'] == '3')
@@ -261,7 +238,7 @@ onp.predict <- function(test, verbose = TRUE, store = FALSE,
     train[, end.col] <- (train[, col] - mean(train[, col])) / sd(train[, col])
   }
 
-  # Logarithmic variables
+  # Logarithmic variables
   log.vars <- c('timedelta', 'kw_max_min', 'kw_min_max', 'kw_avg_max',
                 'kw_max_avg', 'kw_avg_avg', 'self_reference_min_shares',
                 'self_reference_max_shares', 'self_reference_avg_sharess')
@@ -270,18 +247,18 @@ onp.predict <- function(test, verbose = TRUE, store = FALSE,
     train[, end.col] <- log(train[, col] + 1)
   }
 
-  # New features added
+  # New features added
   std.cols <- paste(std.vars, 'std', sep = '_')
   log.cols <- paste('log', log.vars, sep = '_')
 
-  # Final variables
+  # Final variables
   final.vars <- c(nat.vars, new.vars, std.cols, log.cols)
   ##############################################################################
 
   ##############################################################################
   # Test set
   ##############################################################################
-  # See if some observations can be considered outliers
+  # See if some observations can be considered outliers
   killed <- c()
   for (col in nat.vars) {
     if (col != 'popularity' && class(test[, col]) != 'character') {
@@ -295,7 +272,7 @@ onp.predict <- function(test, verbose = TRUE, store = FALSE,
   cat('Total number of observations ("test"):', nrow(test), '\n')
   cat('Number of outliers detected ("test"):', length(killed), '\n')
 
-  # Creating new variables (same as for training set)
+  # Creating new variables (same as for training set)
   # Binary for outliers
   test[, 'is_outlier'] <- 0
   test[killed, 'is_outlier'] <- 1
@@ -315,10 +292,10 @@ onp.predict <- function(test, verbose = TRUE, store = FALSE,
   # Binary kw_avg_max
   test[, 'kw_avg_max_bin'] <- as.numeric(test[, 'kw_avg_max'] >= 1e5)
 
-  # Binary kw_min_avg
+  # Binary kw_min_avg
   test[, 'kw_min_avg_bin'] <- as.numeric(test[, 'kw_min_avg'] >= 0)
 
-  # Binary LDA_0x
+  # Binary LDA_0x
   test[, 'LDA_01_bin'] <- as.numeric(test[, 'LDA_01'] < 0.1)
   test[, 'LDA_02_bin'] <- as.numeric(test[, 'LDA_02'] < 0.1)
   test[, 'LDA_03_bin'] <- as.numeric(test[, 'LDA_03'] < 0.1)
@@ -328,7 +305,7 @@ onp.predict <- function(test, verbose = TRUE, store = FALSE,
   test[, 'LDA_03_bin_int'] <- test[, 'LDA_03'] * test[, 'LDA_03_bin']
   test[, 'LDA_04_bin_int'] <- test[, 'LDA_04'] * test[, 'LDA_04_bin']
 
-  # Categorical title_subjectivity
+  # Categorical title_subjectivity
   q0 <- which(test[, 'title_subjectivity'] <  0.15)
   q1 <- which(test[, 'title_subjectivity'] >= 0.15)
   q2 <- which(test[, 'title_subjectivity'] >= 0.6)
@@ -357,7 +334,7 @@ onp.predict <- function(test, verbose = TRUE, store = FALSE,
   month <- sapply(urls, `[`, 5)
   dates <- paste(years, month, days, sep = '-')
 
-  # Date
+  # Date
   day.one <- as.Date('2013-01-01', '%Y-%m-%d')
   test[, 'date'] <- as.Date(dates, '%Y-%m-%d')
   test[, 'since_20130101'] <- as.numeric(test[, 'date'] - day.one)
@@ -387,10 +364,10 @@ onp.predict <- function(test, verbose = TRUE, store = FALSE,
 
   # Season
   test[, 'season'] <- '4'  # Winter
-  test[which(paste(month, days) > '03 20'), 'season'] <- '1'  # Spring
+  test[which(paste(month, days) > '03 20'), 'season'] <- '1'  # Spring
   test[which(paste(month, days) > '06 20'), 'season'] <- '2'  # Summer
   test[which(paste(month, days) > '09 20'), 'season'] <- '3'  # Autumn
-  test[which(paste(month, days) > '12 20'), 'season'] <- '4'  # Winter
+  test[which(paste(month, days) > '12 20'), 'season'] <- '4'  # Winter
   test[, 'is_spring'] <- as.numeric(test[, 'season'] == '1')
   test[, 'is_summer'] <- as.numeric(test[, 'season'] == '2')
   test[, 'is_autumn'] <- as.numeric(test[, 'season'] == '3')
@@ -410,7 +387,7 @@ onp.predict <- function(test, verbose = TRUE, store = FALSE,
     test[, end.col] <- (test[, col] - mean(test[, col])) / sd(test[, col])
   }
 
-  # Logarithmic variables
+  # Logarithmic variables
   for (col in log.vars) {
     end.col <- paste('log', col, sep = '_')
     test[, end.col] <- log(test[, col] + 1)
@@ -418,7 +395,7 @@ onp.predict <- function(test, verbose = TRUE, store = FALSE,
   ##############################################################################
 
   ##############################################################################
-  # Model
+  # Model
   ##############################################################################
   # Final variables of the model include the original one of the dataset
   model.vars <- unique(c('popularity', final.vars, ori.vars))
@@ -445,7 +422,7 @@ onp.predict <- function(test, verbose = TRUE, store = FALSE,
   if (verbose == TRUE) { cat('Done!\n') }
   ##############################################################################
 
-  # Save the results in the correct format
+  # Save the results in the correct format
   if (store == TRUE) {
     end.path <- ifelse(! is.null(dest.folder), dest.folder, getwd())
     if (! grepl('/$', end.path)) { end.path <- paste(end.path, '/', sep = '') }
@@ -462,4 +439,4 @@ onp.predict <- function(test, verbose = TRUE, store = FALSE,
     return(invisible(result))  
   }  
 }
-# END OF SCRIPT
+# END OF SCRIPT
