@@ -4,11 +4,14 @@
 \alias{onp.predict}
 \title{onp.predict}
 \usage{
-onp.predict(test, verbose = TRUE, store = FALSE, dest.folder = NULL,
-  visible = TRUE, ntree = NA, nodesize = NA, seed = NA, ...)
+onp.predict(test, train = NULL, verbose = TRUE, store = FALSE,
+  dest.folder = NULL, visible = TRUE, ntree = NA, nodesize = NA,
+  seed = NA, ...)
 }
 \arguments{
 \item{test}{A data frame containing a test set with 61 features.}
+
+\item{train}{An optional data frame containing a training set with 62 features.  If not provided, a default internal training set is used.}
 
 \item{verbose}{TRUE if the function should print progress.}
 

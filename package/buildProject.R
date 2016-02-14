@@ -2,7 +2,7 @@ library(devtools)
 library(roxygen2)
 
 #create("unlikelies")
-setwd("C:\\OneDrive\\BGSE\\GitHub\\kaggle\\package")
+setwd("C:\\OneDrive\\BGSE\\GitHub\\kaggle\\package\\unlikelies")
 
 devtools::document()
 devtools::install()
@@ -13,7 +13,7 @@ devtools::check()
 
 install.packages("unlikelies", type="source", repos=NULL)
 
-load("../data/news_popularity_test.RData")
+load("../../data/news_popularity_test.RData")
 
 library(unlikelies)
 
