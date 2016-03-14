@@ -64,7 +64,7 @@ main.05 <- function() {
   # Binary for timedelta
   np.test[, 'timedelta_bin'] <- as.numeric(np.test[, 'timedelta'] >= 400)
   np.test[, 'timedelta_bin_int'] <- np.test[, 'timedelta'] *
-                                     np.test[, 'timedelta_bin']
+                                    np.test[, 'timedelta_bin']
 
   # Categorical for kw_min_min
   np.test[, 'kw_min_min_cat0'] <- 0
@@ -191,6 +191,7 @@ main.05 <- function() {
   # np.test[, 'day_sd_pop_lag3'] <- sds[m3]
 
   # Standardized features
+  #std.vars <- ori.vars[! ori.vars %in% 'popularity']
   std.vars <- c('n_tokens_title', 'n_tokens_content', 'kw_avg_min',
                 'kw_max_max', 'kw_min_avg')
   for (col in std.vars) {
@@ -200,12 +201,13 @@ main.05 <- function() {
   }
 
   # Logarithmic variables
+  #log.vars <- ori.vars[! ori.vars %in% 'popularity']
   log.vars <- c('timedelta', 'kw_max_min', 'kw_min_max', 'kw_avg_max',
                 'kw_max_avg', 'kw_avg_avg', 'self_reference_min_shares',
                 'self_reference_max_shares', 'self_reference_avg_sharess')
   for (col in log.vars) {
     end.col <- paste('log', col, sep = '_')
-    np.test[, end.col] <- log(np.test[, col] + 1)
+    np.test[, end.col] <- log(np.test[, col] + 2)
   }
 
   # New features added
@@ -226,6 +228,8 @@ main.05 <- function() {
   np.test <- np.test[complete.cases(np.test), ]
   np.train <- np.train[complete.cases(np.train), ]
   final.vars <- unique(c('popularity', final.vars, ori.vars))
+  final.vars <- unique(c(ori.vars, final.vars))  # NEW
+  final.varsT <- final.vars[final.vars != 'popularity']  # NEW
   #final.vars <- unique(c('popularity', final.vars))
 
   # Random Forest
@@ -234,12 +238,12 @@ main.05 <- function() {
   ntrees <- 1200
   nodes <- 10
   seed <- 3050
-  # 1. n = 100, s = 65, seed = 2100 EST FINAL: 0.5299 (final + original)
-  # 2. n = 1200, s = 10, seed = 666 EST FINAL: 0.5289 (final)
+  #seed <- 2750
   set.seed(seed)
   rf <- randomForest(y = as.factor(np.train[, 'popularity']),
                      x = np.train[, final.varsT],
-                     ntree = ntrees, nodesize = nodes)
+                     ntree = ntrees, nodesize = nodes)#,
+                     #mtry = length(final.varsT) ** (1 / 3))
   cat('Done!\nnt: ', ntrees, ', ns: ', nodes, ', s: ', seed, '\n', sep = '')
 
   # Predictions

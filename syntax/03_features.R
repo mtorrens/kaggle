@@ -21,10 +21,10 @@ main.03 <- function() {
 
   # Load data
   file <- paste(DATADIR, 'news_popularity_training.RData', sep = '')
-  np.train <- get(load(file = file)); cat('Loaded file:', file, '\n')
+  train <- get(load(file = file)); cat('Loaded file:', file, '\n')
 
   # Interesting original features (chosen by visual inspection from 02)
-  ori.vars <- colnames(np.train)[! colnames(np.train) %in% c('url', 'id')]
+  ori.vars <- colnames(train)[! colnames(np.train) %in% c('url', 'id')]
   nat.vars <- c('popularity', 'timedelta', 'n_tokens_title', 'n_tokens_content',
                 'num_hrefs', 'num_self_hrefs', 'num_imgs', 'num_videos',
                 'data_channel_is_lifestyle', 'data_channel_is_entertainment',
@@ -41,17 +41,17 @@ main.03 <- function() {
                 'title_sentiment_polarity', 'abs_title_sentiment_polarity')
 
   # See if some observations can be considered outliers
-  fives <- which(np.train[, 'popularity'] == 5)
+  fives <- which(train[, 'popularity'] == 5)
   killed <- c()
   extremes <- as.data.frame(matrix(ncol = 0, nrow = 2))
   for (col in nat.vars) {
-    if (class(np.train[, col]) != 'character') {
-      thres <- quantile(np.train[, col], probs = c(0.005, 0.995))
+    if (class(train[, col]) != 'character') {
+      thres <- quantile(train[, col], probs = c(0.005, 0.995))
       extremes <- cbind(extremes, as.data.frame(thres))
       colnames(extremes)[ncol(extremes)] <- col
       #thres <- quantile(np.train[, col], probs = c(0.01, 0.99))
-      outliers <- which(np.train[, col] < thres[1] | 
-                        np.train[, col] > thres[2])
+      outliers <- which(train[, col] < thres[1] | 
+                        train[, col] > thres[2])
       killed <- unique(c(killed, outliers))
     }
   }
@@ -61,7 +61,7 @@ main.03 <- function() {
   save(extremes, file = file); cat('Saved file:', file, '\n')
 
   #killed <- killed[-which(killed %in% fives)]
-  cat('Total number of observations:', nrow(np.train), '\n')
+  cat('Total number of observations:', nrow(train), '\n')
   cat('Number of outliers detected:', length(killed), '\n')
 
   # # We keep the rest
@@ -77,62 +77,62 @@ main.03 <- function() {
   ##############################################################################
   # Creating new variables
   # Binary for outliers
-  np.train[, 'is_outlier'] <- 0
-  np.train[killed, 'is_outlier'] <- 1
+  train[, 'is_outlier'] <- 0
+  train[killed, 'is_outlier'] <- 1
 
   # Binary for timedelta
-  np.train[, 'timedelta_bin'] <- as.numeric(np.train[, 'timedelta'] >= 400)
-  np.train[, 'timedelta_bin_int'] <- np.train[, 'timedelta'] *
-                                     np.train[, 'timedelta_bin']
+  train[, 'timedelta_bin'] <- as.numeric(train[, 'timedelta'] >= 400)
+  train[, 'timedelta_bin_int'] <- train[, 'timedelta'] *
+                                     train[, 'timedelta_bin']
 
   # Categorical for kw_min_min
-  np.train[, 'kw_min_min_cat0'] <- 0
-  np.train[, 'kw_min_min_cat1'] <- 0
-  np.train[, 'kw_min_min_cat2'] <- 0
-  np.train[which(np.train[, 'kw_min_min'] ==  -1), 'kw_min_min_cat0'] <- 1
-  np.train[which(np.train[, 'kw_min_min'] ==   4), 'kw_min_min_cat1'] <- 1
-  np.train[which(np.train[, 'kw_min_min'] == 217), 'kw_min_min_cat2'] <- 1
+  train[, 'kw_min_min_cat0'] <- 0
+  train[, 'kw_min_min_cat1'] <- 0
+  train[, 'kw_min_min_cat2'] <- 0
+  train[which(train[, 'kw_min_min'] ==  -1), 'kw_min_min_cat0'] <- 1
+  train[which(train[, 'kw_min_min'] ==   4), 'kw_min_min_cat1'] <- 1
+  train[which(train[, 'kw_min_min'] == 217), 'kw_min_min_cat2'] <- 1
 
   # Binary kw_avg_max
-  np.train[, 'kw_avg_max_bin'] <- as.numeric(np.train[, 'kw_avg_max'] >= 1e5)
+  train[, 'kw_avg_max_bin'] <- as.numeric(train[, 'kw_avg_max'] >= 1e5)
 
   # Binary kw_min_avg
-  np.train[, 'kw_min_avg_bin'] <- as.numeric(np.train[, 'kw_min_avg'] >= 0)
+  train[, 'kw_min_avg_bin'] <- as.numeric(train[, 'kw_min_avg'] >= 0)
 
   # Binary LDA_0x
-  np.train[, 'LDA_01_bin'] <- as.numeric(np.train[, 'LDA_01'] < 0.1)
-  np.train[, 'LDA_02_bin'] <- as.numeric(np.train[, 'LDA_02'] < 0.1)
-  np.train[, 'LDA_03_bin'] <- as.numeric(np.train[, 'LDA_03'] < 0.1)
-  np.train[, 'LDA_04_bin'] <- as.numeric(np.train[, 'LDA_04'] < 0.1)
-  np.train[, 'LDA_01_bin_int'] <- np.train[, 'LDA_01'] * np.train[, 'LDA_01_bin']
-  np.train[, 'LDA_02_bin_int'] <- np.train[, 'LDA_02'] * np.train[, 'LDA_02_bin']
-  np.train[, 'LDA_03_bin_int'] <- np.train[, 'LDA_03'] * np.train[, 'LDA_03_bin']
-  np.train[, 'LDA_04_bin_int'] <- np.train[, 'LDA_04'] * np.train[, 'LDA_04_bin']
+  train[, 'LDA_01_bin'] <- as.numeric(train[, 'LDA_01'] < 0.1)
+  train[, 'LDA_02_bin'] <- as.numeric(train[, 'LDA_02'] < 0.1)
+  train[, 'LDA_03_bin'] <- as.numeric(train[, 'LDA_03'] < 0.1)
+  train[, 'LDA_04_bin'] <- as.numeric(train[, 'LDA_04'] < 0.1)
+  train[, 'LDA_01_bin_int'] <- train[, 'LDA_01'] * train[, 'LDA_01_bin']
+  train[, 'LDA_02_bin_int'] <- train[, 'LDA_02'] * train[, 'LDA_02_bin']
+  train[, 'LDA_03_bin_int'] <- train[, 'LDA_03'] * train[, 'LDA_03_bin']
+  train[, 'LDA_04_bin_int'] <- train[, 'LDA_04'] * train[, 'LDA_04_bin']
 
   # Categorical title_subjectivity
-  q0 <- which(np.train[, 'title_subjectivity'] <  0.15)
-  q1 <- which(np.train[, 'title_subjectivity'] >= 0.15)
-  q2 <- which(np.train[, 'title_subjectivity'] >= 0.6)
-  np.train[, 'title_subjectivity_cat0'] <- 0
-  np.train[, 'title_subjectivity_cat1'] <- 0
-  np.train[, 'title_subjectivity_cat2'] <- 0
-  np.train[q0, 'title_subjectivity_cat0'] <- 1
-  np.train[q1, 'title_subjectivity_cat1'] <- 1
-  np.train[q2, 'title_subjectivity_cat2'] <- 1
+  q0 <- which(train[, 'title_subjectivity'] <  0.15)
+  q1 <- which(train[, 'title_subjectivity'] >= 0.15)
+  q2 <- which(train[, 'title_subjectivity'] >= 0.6)
+  train[, 'title_subjectivity_cat0'] <- 0
+  train[, 'title_subjectivity_cat1'] <- 0
+  train[, 'title_subjectivity_cat2'] <- 0
+  train[q0, 'title_subjectivity_cat0'] <- 1
+  train[q1, 'title_subjectivity_cat1'] <- 1
+  train[q2, 'title_subjectivity_cat2'] <- 1
 
   # Categorical title_sentiment_polarity
-  q0 <- which(np.train[, 'title_sentiment_polarity'] <  0)
-  q1 <- which(np.train[, 'title_sentiment_polarity'] == 0)
-  q2 <- which(np.train[, 'title_sentiment_polarity'] >  0)
-  np.train[, 'title_sentiment_polarity_cat0'] <- 0
-  np.train[, 'title_sentiment_polarity_cat1'] <- 0
-  np.train[, 'title_sentiment_polarity_cat2'] <- 0
-  np.train[q0, 'title_sentiment_polarity_cat0'] <- 1
-  np.train[q1, 'title_sentiment_polarity_cat1'] <- 1
-  np.train[q2, 'title_sentiment_polarity_cat2'] <- 1
+  q0 <- which(train[, 'title_sentiment_polarity'] <  0)
+  q1 <- which(train[, 'title_sentiment_polarity'] == 0)
+  q2 <- which(train[, 'title_sentiment_polarity'] >  0)
+  train[, 'title_sentiment_polarity_cat0'] <- 0
+  train[, 'title_sentiment_polarity_cat1'] <- 0
+  train[, 'title_sentiment_polarity_cat2'] <- 0
+  train[q0, 'title_sentiment_polarity_cat0'] <- 1
+  train[q1, 'title_sentiment_polarity_cat1'] <- 1
+  train[q2, 'title_sentiment_polarity_cat2'] <- 1
 
   # Extract the date
-  urls <- strsplit(np.train[, 'url'], '/')
+  urls <- strsplit(train[, 'url'], '/')
   days <- sapply(urls, `[`, 6)
   years <- sapply(urls, `[`, 4)
   month <- sapply(urls, `[`, 5)
@@ -140,58 +140,58 @@ main.03 <- function() {
 
   # Date
   day.one <- as.Date('2013-01-01', '%Y-%m-%d')
-  np.train[, 'date'] <- as.Date(dates, '%Y-%m-%d')
-  np.train[, 'since_20130101'] <- as.numeric(np.train[, 'date'] - day.one)
+  train[, 'date'] <- as.Date(dates, '%Y-%m-%d')
+  train[, 'since_20130101'] <- as.numeric(train[, 'date'] - day.one)
 
   # Year
-  np.train[, 'year'] <- years
-  np.train[, 'is_2013'] <- as.numeric(np.train[, 'year'] == '2013')
-  np.train[, 'is_2014'] <- as.numeric(np.train[, 'year'] == '2014')
+  train[, 'year'] <- years
+  train[, 'is_2013'] <- as.numeric(train[, 'year'] == '2013')
+  train[, 'is_2014'] <- as.numeric(train[, 'year'] == '2014')
 
   # Month
-  np.train[, 'month'] <- month
-  np.train[, 'is_jan'] <- as.numeric(np.train[, 'month'] == '01')
-  np.train[, 'is_feb'] <- as.numeric(np.train[, 'month'] == '02')
-  np.train[, 'is_mar'] <- as.numeric(np.train[, 'month'] == '03')
-  np.train[, 'is_apr'] <- as.numeric(np.train[, 'month'] == '04')
-  np.train[, 'is_may'] <- as.numeric(np.train[, 'month'] == '05')
-  np.train[, 'is_jun'] <- as.numeric(np.train[, 'month'] == '06')
-  np.train[, 'is_jul'] <- as.numeric(np.train[, 'month'] == '07')
-  np.train[, 'is_aug'] <- as.numeric(np.train[, 'month'] == '08')
-  np.train[, 'is_sep'] <- as.numeric(np.train[, 'month'] == '09')
-  np.train[, 'is_oct'] <- as.numeric(np.train[, 'month'] == '10')
-  np.train[, 'is_nov'] <- as.numeric(np.train[, 'month'] == '11')
-  np.train[, 'is_dec'] <- as.numeric(np.train[, 'month'] == '12')
+  train[, 'month'] <- month
+  train[, 'is_jan'] <- as.numeric(train[, 'month'] == '01')
+  train[, 'is_feb'] <- as.numeric(train[, 'month'] == '02')
+  train[, 'is_mar'] <- as.numeric(train[, 'month'] == '03')
+  train[, 'is_apr'] <- as.numeric(train[, 'month'] == '04')
+  train[, 'is_may'] <- as.numeric(train[, 'month'] == '05')
+  train[, 'is_jun'] <- as.numeric(train[, 'month'] == '06')
+  train[, 'is_jul'] <- as.numeric(train[, 'month'] == '07')
+  train[, 'is_aug'] <- as.numeric(train[, 'month'] == '08')
+  train[, 'is_sep'] <- as.numeric(train[, 'month'] == '09')
+  train[, 'is_oct'] <- as.numeric(train[, 'month'] == '10')
+  train[, 'is_nov'] <- as.numeric(train[, 'month'] == '11')
+  train[, 'is_dec'] <- as.numeric(train[, 'month'] == '12')
 
   # Day
-  np.train[, 'day'] <- days
+  train[, 'day'] <- days
 
   # Season
-  np.train[, 'season'] <- '4'  # Winter
-  np.train[which(paste(month, days) > '03 20'), 'season'] <- '1'  # Spring
-  np.train[which(paste(month, days) > '06 20'), 'season'] <- '2'  # Summer
-  np.train[which(paste(month, days) > '09 20'), 'season'] <- '3'  # Autumn
-  np.train[which(paste(month, days) > '12 20'), 'season'] <- '4'  # Winter
-  np.train[, 'is_spring'] <- as.numeric(np.train[, 'season'] == '1')
-  np.train[, 'is_summer'] <- as.numeric(np.train[, 'season'] == '2')
-  np.train[, 'is_autumn'] <- as.numeric(np.train[, 'season'] == '3')
-  np.train[, 'is_winter'] <- as.numeric(np.train[, 'season'] == '4')
+  train[, 'season'] <- '4'  # Winter
+  train[which(paste(month, days) > '03 20'), 'season'] <- '1'  # Spring
+  train[which(paste(month, days) > '06 20'), 'season'] <- '2'  # Summer
+  train[which(paste(month, days) > '09 20'), 'season'] <- '3'  # Autumn
+  train[which(paste(month, days) > '12 20'), 'season'] <- '4'  # Winter
+  train[, 'is_spring'] <- as.numeric(train[, 'season'] == '1')
+  train[, 'is_summer'] <- as.numeric(train[, 'season'] == '2')
+  train[, 'is_autumn'] <- as.numeric(train[, 'season'] == '3')
+  train[, 'is_winter'] <- as.numeric(train[, 'season'] == '4')
 
   # Daily scores
   # (checked days from beginning to end have some news)
-  counts <- tapply(rep(1, nrow(np.train)), np.train[, 'date'], sum)
-  avg <- tapply(np.train[, 'popularity'], np.train[, 'date'], mean)
-  sds <- tapply(np.train[, 'popularity'], np.train[, 'date'], sd)
+  counts <- tapply(rep(1, nrow(train)), train[, 'date'], sum)
+  avg <- tapply(train[, 'popularity'], train[, 'date'], mean)
+  sds <- tapply(train[, 'popularity'], train[, 'date'], sd)
 
-  file <- paste(DATADIR, 'daily_scores.RData', sep = '')
-  save(counts, avg, sds, file = file); cat('Saved file:', file, '\n')
+  # file <- paste(DATADIR, 'daily_scores.RData', sep = '')
+  # save(counts, avg, sds, file = file); cat('Saved file:', file, '\n')
 
-  m1 <- match(as.character(np.train[, 'date']), names(counts))
-  m2 <- match(as.character(np.train[, 'date']), names(avg))
-  m3 <- match(as.character(np.train[, 'date']), names(sds))
-  np.train[, 'day_news'] <- counts[m1]
-  np.train[, 'day_avg_pop'] <- avg[m2]
-  np.train[, 'day_sd_pop'] <- sds[m3]
+  m1 <- match(as.character(train[, 'date']), names(counts))
+  m2 <- match(as.character(train[, 'date']), names(avg))
+  m3 <- match(as.character(train[, 'date']), names(sds))
+  train[, 'day_news'] <- counts[m1]
+  train[, 'day_avg_pop'] <- avg[m2]
+  train[, 'day_sd_pop'] <- sds[m3]
 
   # m1 <- match(as.character(np.train[, 'date'] - 1), names(counts))
   # m2 <- match(as.character(np.train[, 'date'] - 1), names(avg))
@@ -232,21 +232,22 @@ main.03 <- function() {
                 # 'day_sd_pop_lag3')
 
   # Standardized features
+  #std.vars <- ori.vars[! ori.vars %in% 'popularity']
   std.vars <- c('n_tokens_title', 'n_tokens_content', 'kw_avg_min',
                 'kw_max_max', 'kw_min_avg')
   for (col in std.vars) {
     end.col <- paste(col, 'std', sep = '_')
-    np.train[, end.col] <- (np.train[, col] - mean(np.train[, col])) /
-                           sd(np.train[, col])
+    train[, end.col] <- (train[, col] - mean(train[, col])) / sd(train[, col])
   }
 
   # Logarithmic variables
+  #log.vars <- ori.vars[! ori.vars %in% 'popularity']
   log.vars <- c('timedelta', 'kw_max_min', 'kw_min_max', 'kw_avg_max',
                 'kw_max_avg', 'kw_avg_avg', 'self_reference_min_shares',
                 'self_reference_max_shares', 'self_reference_avg_sharess')
   for (col in log.vars) {
     end.col <- paste('log', col, sep = '_')
-    np.train[, end.col] <- log(np.train[, col] + 1)
+    train[, end.col] <- log(train[, col] + 2)
   }
 
   # New features added
@@ -255,6 +256,7 @@ main.03 <- function() {
 
   # Final variables
   final.vars <- c(nat.vars, new.vars, std.cols, log.cols)
+  np.train <- train
 
   # Save results
   file1 <- paste(DATADIR, 'final_variable_list.RData', sep = '')
