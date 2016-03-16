@@ -1,8 +1,20 @@
-library(devtools)
-library(roxygen2)
+################################################################################
+# Load, and install if necessary, required packages.
+################################################################################
+if (!require(devtools))
+{
+  install.packages("devtools")
+  library(devtools)
+}
+if (!require(roxygen2))
+{
+  install.packages("roxygen2")
+  library(roxygen2)
+}
 
-#create("unlikelies")
-setwd("C:\\OneDrive\\BGSE\\GitHub\\kaggle\\package\\unlikelies")
+cat("The working directory should be set to the location of this script.")
+
+setwd("unlikelies")
 
 devtools::document()
 devtools::install()
