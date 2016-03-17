@@ -14,3 +14,5 @@ The structure of the repository contains the following folders:
  * `package`: files related to the R package built for the project
  * `syntax`: source code with the R scripts used to produce the results
  * `temp`: temporary files used and stored during the development of the project
+
+The final report can be found in the `doc` folder.
