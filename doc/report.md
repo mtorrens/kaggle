@@ -129,4 +129,4 @@ Ten times do the following:
 
 ####Conclusion
 
-With enough development effort and tuning, the ensemble method may have been more successful.  However, its complexity and the time it took to run a test were its downfall.  Ultimately, variable selection, feature creation, and parameter tuning of a basic Random Forest implementation produced our best results.
+With enough development effort and tuning, the ensemble method may have been more successful.  However, its complexity and the time it took to run a test were its downfall.  Ultimately, variable selection, feature creation, and parameter tuning of a basic Random Forest implementation produced our best results. It is still improvable by finding solutions to avoid overpredicting twos, and especially to be able to spot viral arcticles, which random forest could not find.
