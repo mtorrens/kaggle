@@ -32,13 +32,10 @@
 #' @param nodesize Ending node size for the random forest.
 #' @param seed Starting random seed for the random forest.
 #' @param ... Additional parameters to the model generator randomForest().
-#' 
 #' @return A dataframe containing two columns: id, popularity
-#' 
 #' @examples
 #' # predictions <- onp.predict(test)
 #' # predictions <- onp.predict(test,train)
-#' 
 #' @export
 onp.predict <- function(test, train = NULL, verbose = TRUE, store = FALSE,
                         dest.folder = NULL, visible = TRUE, ntree = NA,
