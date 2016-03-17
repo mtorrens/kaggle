@@ -1,0 +1,119 @@
+load("/Users/miquel/Desktop/bgse/projects/kaggle/temp/comb.RData")
+comb
+max(comb)
+max(comb, na.rm = T)
+load("/Users/miquel/Desktop/bgse/projects/kaggle/temp/optimal_rf.RData")
+ls()
+res
+load("/Users/miquel/Desktop/bgse/projects/kaggle/temp/optimal_rf.RData")
+ls()
+head(res)
+tail(res)
+load("/Users/miquel/Desktop/bgse/projects/kaggle/temp/optimal_rf.RData")
+ls()
+res
+load("/Users/miquel/Desktop/bgse/projects/kaggle/temp/optimal_rf.RData")
+ls()
+res
+res[which.max(res[, 'accuracy']), ]
+load("/Users/miquel/Desktop/bgse/projects/kaggle/temp/optimal_rf.RData")
+res[which.max(res[, 'accuracy']), ]
+res
+load("/Users/miquel/Desktop/bgse/projects/kaggle/temp/optimal_rf.RData")
+res[which.max(res[, 'accuracy']), ]
+tapply(res$accuracy, res$ntrees, mean)
+tapply(res[, 'accuracy'], res[, 'nodesize'], mean)
+load("/Users/miquel/Desktop/bgse/projects/kaggle/temp/optimal_rf.RData")
+res[which.max(res[, 'accuracy']), ]
+tapply(res$accuracy, res$ntrees, mean)
+tapply(res[, 'accuracy'], res[, 'nodesize'], mean)
+load("/Users/miquel/Desktop/bgse/projects/kaggle/temp/optimal_rf.RData")
+res[which.max(res[, 'accuracy']), ]
+tapply(res$accuracy, res$ntrees, mean)
+tapply(res[, 'accuracy'], res[, 'nodesize'], mean)
+q('no')
+load("/Users/miquel/Desktop/bgse/projects/kaggle/temp/optimal_rf2.RData")
+res[which.max(res[, 'accuracy']), ]#
+  tapply(res[, 'accuracy'], res[, 'ntrees'], mean)#
+  tapply(res[, 'accuracy'], res[, 'nodesize'], mean)
+res
+plot(res$accuracy)
+plot(res$accuracy, type = 'l')
+load("/Users/miquel/Desktop/bgse/projects/kaggle/temp/optimal_rf2.RData")
+res[which.max(res[, 'accuracy']), ]#
+  tapply(res[, 'accuracy'], res[, 'ntrees'], mean)#
+  tapply(res[, 'accuracy'], res[, 'nodesize'], mean)
+plot(tapply(res[, 'accuracy'], res[, 'nodesize'], mean)#
+, type = 'l')
+load("/Users/miquel/Desktop/bgse/projects/kaggle/temp/optimal_rf2.RData")
+res[which.max(res[, 'accuracy']), ]#
+  tapply(res[, 'accuracy'], res[, 'ntrees'], mean)#
+  tapply(res[, 'accuracy'], res[, 'nodesize'], mean)
+plot(tapply(res[, 'accuracy'], res[, 'nodesize'], mean), type = 'l')
+load("/Users/miquel/Desktop/bgse/projects/kaggle/temp/optimal_rf2.RData")
+res[which.max(res[, 'accuracy']), ]#
+  tapply(res[, 'accuracy'], res[, 'ntrees'], mean)#
+  tapply(res[, 'accuracy'], res[, 'nodesize'], mean)
+plot(tapply(res[, 'accuracy'], res[, 'nodesize'], mean), type = 'l')
+load("/Users/miquel/Desktop/bgse/projects/kaggle/temp/optimal_rf2.RData")
+res[which.max(res[, 'accuracy']), ]#
+  tapply(res[, 'accuracy'], res[, 'ntrees'], mean)#
+  tapply(res[, 'accuracy'], res[, 'nodesize'], mean)
+plot(tapply(res[, 'accuracy'], res[, 'nodesize'], mean), type = 'l')
+load("/Users/miquel/Desktop/bgse/projects/kaggle/temp/optimal_rf2.RData")
+res[which.max(res[, 'accuracy']), ]#
+  tapply(res[, 'accuracy'], res[, 'ntrees'], mean)#
+  tapply(res[, 'accuracy'], res[, 'nodesize'], mean)
+plot(tapply(res[, 'accuracy'], res[, 'nodesize'], mean), type = 'l')
+plot(res[which(res$nodesize == 65), 'accuracy'], type = 'l')
+load("/Users/miquel/Desktop/bgse/projects/kaggle/temp/optimal_rf2.RData")
+res[which.max(res[, 'accuracy']), ]#
+  tapply(res[, 'accuracy'], res[, 'ntrees'], mean)#
+  tapply(res[, 'accuracy'], res[, 'nodesize'], mean)
+plot(tapply(res[, 'accuracy'], res[, 'nodesize'], mean), type = 'l')
+load("/Users/miquel/Desktop/bgse/projects/kaggle/temp/optimal_rf2.RData")
+res[which.max(res[, 'accuracy']), ]#
+  tapply(res[, 'accuracy'], res[, 'ntrees'], mean)#
+  tapply(res[, 'accuracy'], res[, 'nodesize'], mean)
+plot(tapply(res[, 'accuracy'], res[, 'nodesize'], mean), type = 'l')
+plot(tapply(res[, 'accuracy'], res[, 'ntrees'], mean), type = 'l')
+load("/Users/miquel/Desktop/bgse/projects/kaggle/temp/optimal_rf2.RData")
+res[which.max(res[, 'accuracy']), ]#
+  tapply(res[, 'accuracy'], res[, 'ntrees'], mean)#
+  tapply(res[, 'accuracy'], res[, 'nodesize'], mean)
+plot(tapply(res[, 'accuracy'], res[, 'nodesize'], mean), type = 'l')
+plot(tapply(res[, 'accuracy'], res[, 'ntrees'], mean), type = 'l')
+load("/Users/miquel/Desktop/bgse/projects/kaggle/temp/optimal_rf2.RData")
+res[which.max(res[, 'accuracy']), ]#
+  tapply(res[, 'accuracy'], res[, 'ntrees'], mean)#
+  tapply(res[, 'accuracy'], res[, 'nodesize'], mean)
+load("/Users/miquel/Desktop/bgse/projects/kaggle/temp/optimal_rf2.RData")
+res[which.max(res[, 'accuracy']), ]#
+  tapply(res[, 'accuracy'], res[, 'ntrees'], mean)#
+  tapply(res[, 'accuracy'], res[, 'nodesize'], mean)
+load("/Users/miquel/Desktop/bgse/projects/kaggle/temp/optimal_rf2.RData")
+res[which.max(res[, 'accuracy']), ]#
+  tapply(res[, 'accuracy'], res[, 'ntrees'], mean)#
+  tapply(res[, 'accuracy'], res[, 'nodesize'], mean)
+res
+load("/Users/miquel/Desktop/bgse/projects/kaggle/temp/optimal_rf2.RData")
+res
+res[which.max(res[, 'accuracy']), ]#
+  tapply(res[, 'accuracy'], res[, 'ntrees'], mean)#
+  tapply(res[, 'accuracy'], res[, 'nodesize'], mean)
+load("/Users/miquel/Desktop/bgse/projects/kaggle/temp/optimal_rf4.RData")
+sl()
+ls()
+head(res)
+res[which.max(res[, 3]), ]
+load("/Users/miquel/Desktop/bgse/projects/kaggle/temp/optimal_rf4.RData")
+res[which.max(res[, 3]), ]
+res[order(sort[, 3]), ]
+res[order(res[, 3]), ]
+load("/Users/miquel/Desktop/bgse/projects/kaggle/temp/optimal_rf4.RData")
+res[order(res[, 3]), ]
+seq(100, 5000, 50)
+load("/Users/miquel/Desktop/bgse/projects/kaggle/temp/optimal_rf4.RData")
+res[order(res[, 3]), ]
+load("/Users/miquel/Desktop/bgse/projects/kaggle/temp/optimal_rf4.RData")
+res[order(res[, 3]), ]
