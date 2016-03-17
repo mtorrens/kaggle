@@ -1,6 +1,6 @@
-## The Unlikelies - Report on Kaggle Competition
+##The Unlikelies - Report on Kaggle Competition
 
-### Data Preparation
+###Data Preparation
 
 Transformation of the features was carried out by visual inspection. We had three main plots to understand the behaviour of each variable: a density plot, a bivariate plot (density for the variable for each class) and a boxplot conditional on class.  All plots can be found in the `temp/summaries` folder on GitHub.  Here are a couple of examples:
 
@@ -53,39 +53,46 @@ We considered lags of the popularity of other known articles in aggregate.  Assu
 
 A full list of the transformations can be found in the script `03_features.R`.
 
-#### Outlier Detection and Handling
+####Outlier Detection and Handling
 All continuous variables were scanned for outliers.  We treated any value that was in the upper or lower 5% quantile for the distribution of that variable to be an outlier.  Any outlying value resulted in us considering the entire observation to be an outlier.  We did not eliminate the outliers, however.  We simply added a new binary feature called `is_outlier` and set it to 1 for those observations.  The reasoning behind this was that outliers are not too much of a problem for Random Forest in general, but it could be useful to allow Random Forest to branch on outliers in some situation. Also, most of the observations with high class (4s and 5s) were outliers for some features, so we decided not to eliminate them from the set.
 
-### Models Investigated But Not Selected
-#### Support Vector Machine
+###Models Investigated But Not Selected
+####Support Vector Machine
 We used the implementation of an SVM from the R package `e1071` with a radial kernel function and achieved a score of 52% correctness.
 
-#### Neural Networks
+####Neural Networks
 We used the implementation of a neural network from the R package `nnet` and achieved a score of 51% correctness.
 
-#### K-Nearest Neighbors
+####K-Nearest Neighbors
 We used the implementation of KNN from the R package `class`.  We tried a wide range of values for ‘k’.  The best that the K-Nearest Neighbors approach gave us was a cross-validated score of 47% correctness.
 
-#### Adaptive Boosting
+####Adaptive Boosting
 We used the implementation of Adaptive Boosting from the R package `maboost`.  At the time, we concluded it was not successful enough, and did not record a score.
 Multinomial Logit
 We used the implementation of Multinomal Logit Regression from the `nnet` package.  At the time, we concluded it was not successful enough, and did not record a score.
 
-#### Linear Discriminant Analysis
+####Linear Discriminant Analysis
 We used the ‘lda’ function from the `MASS` package.  At the time, we concluded it was not successful enough, and did not record a score.
 
-#### Others 
+####Others 
 Quick investigations of packages offering Ordinal Logistic Regression, Stochastic Gradient Descent, and Logistic Regression, but did not prove sufficiently successful.
 
-### Final Model
-#### Random Forest
+###Final Model
+####Random Forest
 Our investigation of Random Forest, using the `randomForest` R package proved immediately more successful than the others.  With zero tuning, it put us on top of the public leaderboard and we remained there for a long time.  In fact, all attempts at tuning resulted in less good scores on the leaderboard.  However, we persisted with our tuning and other efforts as we were able to improve our internally cross-validated scores.
 
-#### Hyper-Parameter Tuning
+####Hyper-Parameter Tuning
 We performed tuning on hyper-parameters on our Random Forest model.  Rather than using an out-of-the-box package for tuning, we wrote a small amount of R code to do it for us.  We looped over numerous values for `ntree` (number of trees in the forest), `nodesize` (minimum number of observations in a node), `mtry` (the number of variables randomly sampled at each split), `importance` (allowing the algorithm to assess the individual importance of each feature), and `corr.bias` (experimental).  Ultimately, we only selected to explicitly set ntree and nodesize.
 
-#### Ensemble Processing
-We had initial success with ensemble processing earlier in the competition.  It earned us second place on Kaggle's public leaderboard.  However, the gains were eclipsed with simpler methods.  For the sake of posterity, the ensemble method is described here.
+###Advantages of the model
+- Takes into account non-linearities, outliers and time data
+
+###Pitfalls of the model
+- Over predicting twos.
+- Missing on fours and fives (too few and outlier observations)
+
+###Ensemble Processing
+A parallel effort which we developed under the expectation that it would be our best approach was an ensemble method.  It actually landed us in second position at the interim milestone and provided us our best internal cross-validated score.  However, when the final results were tallied, it was a simpler approach that prevailed.  For posterity's sake, this parallel effort is described below.
 
 We performed our ensemble “post-processing” upon the results from the Random Forest model described in the previous section.  This was motivated by the fact that we could evaluate the votes that came from the trees in the forest, and could see that 83% of the time, the correct classification was either the first or second choice coming out of Random Forest.  We believed that if we focused on that 83% and treated it as a binary classification problem, we had a chance of doing better than the single-stage five-class problem.
 
@@ -95,7 +102,7 @@ Given that the original Random Forest was still correct more than it was incorre
 
 The full procedure above was repeated 10 times, each time with a 50% training set and a 50% test set.  The 50% test set then became the training set for the final Random Forest model.  The splits were performed in a manner such that each row was in a training set 5 times and in a test set 5 times.  The result was 10 “meta models”, each of which contributed one vote when running true predictions.
 
-#### Steps for the Training Procedure
+####Steps for the Training Procedure
 
 - Split the data set in ten approximately equal groups randomly.
 - Ten times do the following:
@@ -108,7 +115,7 @@ The full procedure above was repeated 10 times, each time with a 50% training se
 - One time do the following:
 -   Run a final Random Forest model on the test set (now a training set) along with the predictions, and where possible, the probabilities, from each model.
 
-#### Steps for the Predicting Procedure
+####Steps for the Predicting Procedure
 
 Ten times do the following:
 -   Predict using the 10 primary Random Forest models.
@@ -120,9 +127,6 @@ Ten times do the following:
 - One time do the following:
 -   For each observation, take the mode of the predictions of the meta models, and use that as our final prediction.
 
-### Advantages of the model
-- Takes into account non-linearities, outliers and time data
+####Conclusion
 
-### Pitfalls of the model
-- Over predicting twos.
-- Missing on fours and fives (too few and outlier observations)
+With enough development effort and tuning, the ensemble method may have been more successful.  However, its complexity and the time it took to run a test were its downfall.  Ultimately, variable selection, feature creation, and parameter tuning of a basic Random Forest implementation produced our best results.
