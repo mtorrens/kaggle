@@ -14,7 +14,7 @@
 #' Use features, outlier detection, and hyperparameter optimization brought to
 #' you by the Unlikelies to predict online news popularity.
 #' 
-#' The Unlikelies (c) 2016.02.12
+#' The Unlikelies (c) 2016.03.17
 #' Authors: Roger Cusco, Matthew Sudmann-Day, Miquel Torrens
 #'
 #' DISCLAIMER: Evaluator's eyes only. This function contains confidential
@@ -38,7 +38,7 @@ onp.predict <- function(test, train = NULL, verbose = TRUE, store = FALSE,
                         dest.folder = NULL, visible = TRUE, ntree = NA,
                         nodesize = NA, seed = NA, ...) {
 
-    # Required packages
+  # Required packages
   if (! require(randomForest)) {
     stop('required package not installed: "randomForest"')
   } else {
