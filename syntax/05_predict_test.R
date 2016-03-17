@@ -237,13 +237,13 @@ main.05 <- function() {
   final.varsT <- final.vars[final.vars != 'popularity']
   ntrees <- 1200
   nodes <- 10
-  seed <- 3050
-  #seed <- 2750
+  #seed <- 3050
+  seed <- 3090
   set.seed(seed)
   rf <- randomForest(y = as.factor(np.train[, 'popularity']),
                      x = np.train[, final.varsT],
-                     ntree = ntrees, nodesize = nodes)#,
-                     #mtry = length(final.varsT) ** (1 / 3))
+                     ntree = ntrees, nodesize = nodes,
+                     mtry = length(final.varsT) ** (1 / 3))
   cat('Done!\nnt: ', ntrees, ', ns: ', nodes, ', s: ', seed, '\n', sep = '')
 
   # Predictions
