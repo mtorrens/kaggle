@@ -9,3 +9,7 @@ License: see LICENSE
 RoxygenNote: 5.0.1
 LazyData: true
 Depends: R (>= 3.2.0)
+Imports: gbm,
+    survival,
+    rpart,
+    maboost

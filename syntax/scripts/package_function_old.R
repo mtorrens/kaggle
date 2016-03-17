@@ -402,7 +402,7 @@ onp.predict <- function(test, train = NULL, verbose = TRUE, store = FALSE,
   model.varsT <- model.vars[model.vars != 'popularity']
 
   # Define model parameters
-  if (is.na(seed)) { seed <- 3090 }
+  if (is.na(seed)) { seed <- 3050 }
   if (is.na(ntree)) { ntree <- 1200 }
   if (is.na(nodesize)) { nodesize <- 10 }
 
@@ -411,8 +411,7 @@ onp.predict <- function(test, train = NULL, verbose = TRUE, store = FALSE,
   set.seed(seed)
   rf <- randomForest(y = as.factor(train[, 'popularity']),
                      x = train[, model.varsT],
-                     ntree = ntree, nodesize = nodesize,
-                     mtry = length(model.vars) ** (1 / 3), ...)
+                     ntree = ntree, nodesize = nodesize, ...)
   if (verbose == TRUE) { cat('Done!\n') }
 
   # Predictions

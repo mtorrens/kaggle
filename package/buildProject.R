@@ -16,6 +16,10 @@ cat("The working directory should be set to the location of this script.")
 
 setwd("unlikelies")
 
+pkgs <- c('survival', 'gbm', 'rpart', 'maboost')
+for (pkg in pkgs) {
+  devtools::use_package(pkg)  
+}
 devtools::document()
 devtools::install()
 devtools::check()
