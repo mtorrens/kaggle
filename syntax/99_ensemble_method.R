@@ -1223,26 +1223,32 @@ buildMetaModels <- function(numSplits, data)
 #' driver
 #
 #' @param loadFromCache TRUE if we should attempt to load the output of this function from the cache
-driver <- function()
+onp.predict.2 <- function(test)
 {
   numSplits <- 10
-  setAside <- 0.2
+  setAside <- 0 #0.2
   
   #Train with optional set-aside for cross-validation.
   data <- loadAllTrainingData(numSplits, setAside, TRUE)
   buildMetaModels(numSplits, data)
+  return(produceFinalPredictions(numSplits, test))
   
-  # Test against the test data.
-  load("../data/setAside.RData") #setAsideData
-  preds <- produceFinalPredictions(numSplits, setAsideData)
-  mean(preds$popularity == setAsideData$popularity)
-
-  # Create an entry for submission.
-  data <- loadDataForSubmission(FALSE)
-  finalPreds <- produceFinalPredictions(numSplits, data)
-  print(head(finalPreds))
-  path <- "../data/submission6.csv"
-  write.csv(finalPreds, path, row.names=FALSE)
-  cat(paste("The file for submission, '", path, "', has been written.", sep=""))
+  if (FALSE)
+  {
+    # Test against the test data.
+    load("../data/setAside.RData") #setAsideData
+    preds <- produceFinalPredictions(numSplits, setAsideData)
+    mean(preds$popularity == setAsideData$popularity)
+  
+    # Create an entry for submission.
+    data <- loadDataForSubmission(FALSE)
+    finalPreds <- produceFinalPredictions(numSplits, data)
+    print(head(finalPreds))
+    path <- "../data/submission6.csv"
+    write.csv(finalPreds, path, row.names=FALSE)
+    cat(paste("The file for submission, '", path, "', has been written.", sep=""))
+  }
+  
+  return(produceFinalPredictions(numSplits, data))
 }
 

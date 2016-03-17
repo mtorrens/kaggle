@@ -29,17 +29,25 @@ onp.predict(test, train = NULL, verbose = TRUE, store = FALSE,
 
 \item{...}{Additional parameters to the model generator randomForest().}
 }
+\value{
+A dataframe containing two columns: id, popularity
+}
 \description{
 Use features, outlier detection, and hyperparameter optimization brought to
 you by the Unlikelies to predict online news popularity.
 }
 \details{
-The Unlikelies (c) 2016.02.12
+The Unlikelies (c) 2016.03.17
 Authors: Roger Cusco, Matthew Sudmann-Day, Miquel Torrens
 
 DISCLAIMER: Evaluator's eyes only. This function contains confidential
 procedures for the Kaggle competition results and must not be released or
 displayed to third parties under any circumstance without express written
 permission by the authors.
+}
+\examples{
+# predictions <- onp.predict(test)
+# predictions <- onp.predict(test,train)
+
 }
 
