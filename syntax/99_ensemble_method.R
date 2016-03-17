@@ -595,7 +595,7 @@ trainPrimaryRfModel <- function(data, key, loadFromCache=FALSE)
 {
   cat(paste("  TRAINING ORIGINAL RF MODEL {CV ", key, "}\n", sep=""))
   
-   # Load the output of this function from cache if appropriate.
+  # Load the output of this function from cache if appropriate.
   cacheFile = paste("../data/cache.trainOriginalRfModel_", key, ".RData", sep="")
   if (loadFromCache == TRUE && file.exists(cacheFile))
   {
@@ -654,16 +654,16 @@ trainMultipleRfModels <- function(data, key, loadFromCache=FALSE)
             n <- s*(1:5)
             u <- n[n>0]
             
-			# Now, we only consider combinations of two classes.
+	      		# Now, we only consider combinations of two classes.
             if (sum(s) == 2)
             {
               key <- paste(u, collapse="")
               cat(paste(key, "...", sep=""))
               
-			  # Filter the training data to only the classes we are currently considering.
+			        # Filter the training data to only the classes we are currently considering.
               tempData <- data[data$popularity %in% u, ]
               
-			  # Create the model and put it in the models list.
+              # Create the model and put it in the models list.
               models[[key]] <- randomForest(y=as.factor(tempData$popularity), x=tempData[, vars],
                                             ntree=1200, nodesize=10)
             }
@@ -707,7 +707,7 @@ trainMultipleGbmModels <- function(data, key, loadFromCache=FALSE)
   # Loop through all possible combinations of included classifications.
   for (a1 in 0:1) {
     for (a2 in 0:1) {
-	for (a3 in 0:1) {
+	    for (a3 in 0:1) {
         for (a4 in 0:1) {
           for (a5 in 0:1) {
             
@@ -715,17 +715,17 @@ trainMultipleGbmModels <- function(data, key, loadFromCache=FALSE)
             n <- s*(1:5)
             u <- n[n>0]
             
-			# Now, we only consider combinations of two classes.
+			      # Now, we only consider combinations of two classes.
             if (sum(s) == 2)
             {
               key <- paste(u, collapse="")
               cat(paste(key, "...", sep=""))
               
-			  # Filter the training data to only the classes we are currently considering.
+			        # Filter the training data to only the classes we are currently considering.
               tempData <- data[data$popularity %in% u, ]
               tempData$popularity <- ifelse(tempData$popularity == min(u), 0, 1)
               
- 			  # Create the model and put it in the models list.
+ 			        # Create the model and put it in the models list.
               models[[key]] <- trainOneGbmModel(tempData)
             }
           }
@@ -777,19 +777,19 @@ trainMultipleMaBoostModels <- function(data, key, loadFromCache=FALSE)
             n <- s*(1:5)
             u <- n[n>0]
             
-			# Now, we only consider combinations of two classes.
+			      # Now, we only consider combinations of two classes.
             if (sum(s) == 2)
             {
               key <- paste(u, collapse="")
               cat(paste(key, "...", sep=""))
               
-			  # Filter the training data to only the classes we are currently considering.
+			        # Filter the training data to only the classes we are currently considering.
               tempData <- data[data$popularity %in% u, ]
               truth <- tempData$popularity
               tempData <- tempData[, vars]
               tempData$popularity <- truth
               
-			  # Create the model and put it in the models list.
+			        # Create the model and put it in the models list.
               models[[key]] <- maboost(as.factor(popularity) ~ ., data = tempData)
             }
           }
@@ -949,21 +949,21 @@ applyGbmModels <- function(models, data, preds)
             n <- s*(1:5)
             u <- n[n>0]
             
-			# Now, we only consider combinations of two classes.
+			      # Now, we only consider combinations of two classes.
             if (sum(s) == 2)
             {
               key <- paste(u, collapse="")
               cat(paste(key, "...", sep=""))
               
-			  # Filter the training data to only the classes we are currently considering.
+			        # Filter the training data to only the classes we are currently considering.
               tempData <- data[preds$pred %in% u & preds$pred2 %in% u, ]
               if (nrow(tempData) > 0)
               {
-			    # Extract the model from the models list and apply it to the selected data.
+			          # Extract the model from the models list and apply it to the selected data.
                 model <- models[[key]]
                 gbmPreds <- predict(model, tempData, n.trees=2000, type="response")
                 
-				# Copy the generated predictions into our larger test set.
+				        # Copy the generated predictions into our larger test set.
                 for (i in 1:nrow(tempData))
                 {
                   preds$gbmProb[data$id==tempData$id[i]] <- gbmPreds[i]
@@ -1008,21 +1008,21 @@ applyMaBoostModels <- function(models, data, preds)
             n <- s*(1:5)
             u <- n[n>0]
             
- 			# Now, we only consider combinations of two classes.
+ 			      # Now, we only consider combinations of two classes.
             if (sum(s) == 2)
             {
               key <- paste(u, collapse="")
               cat(paste(key, "...", sep=""))
               
-			  # Filter the training data to only the classes we are currently considering.
+			        # Filter the training data to only the classes we are currently considering.
               tempData <- data[preds$pred %in% u & preds$pred2 %in% u, ]
               if (nrow(tempData) > 0)
               {
- 			    # Extract the model from the models list and apply it to the selected data.
+ 			          # Extract the model from the models list and apply it to the selected data.
                 model <- models[[key]]
                 maBoostPreds <- predict(model, tempData, type="class")
                 
-				# Copy the generated predictions into our larger test set.
+				        # Copy the generated predictions into our larger test set.
                 for (i in 1:nrow(tempData))
                 {
                   preds$maBoostPred[data$id==tempData$id[i]] <- as.numeric(levels(maBoostPreds)[maBoostPreds[i]])
@@ -1066,21 +1066,21 @@ applyRfModels <- function(models, data, preds)
             n <- s*(1:5)
             u <- n[n>0]
             
- 			# Now, we only consider combinations of two classes.
+ 			      # Now, we only consider combinations of two classes.
             if (sum(s) == 2)
             {
               key <- paste(u, collapse="")
               cat(paste(key, "...", sep=""))
               
-			  # Filter the training data to only the classes we are currently considering.
+			        # Filter the training data to only the classes we are currently considering.
               tempData <- data[preds$pred %in% u & preds$pred2 %in% u, ]
               if (nrow(tempData) > 0)
               {
-			    # Extract the model from the models list and apply it to the selected data.
+			          # Extract the model from the models list and apply it to the selected data.
                 model <- models[[key]]
                 rfPreds <- predict(model, tempData, type="prob")
 
-				# Copy the generated predictions into our larger test set.
+				        # Copy the generated predictions into our larger test set.
                 for (i in 1:nrow(tempData))
                 {
                   #preds$rfPred[data$id==tempData$id[i]] <- rfPreds[i]
@@ -1122,37 +1122,37 @@ produceFinalPredictions <- function(numSplits, data)
     
     key <- paste(split, "of", numSplits, sep="")
     
-	# Load the primary Random Forest model from cache and preserve its predictions.
+	  # Load the primary Random Forest model from cache and preserve its predictions.
     primaryRfModel <- trainPrimaryRfModel(NULL, key, TRUE)
     preds <- applyPrimaryRfModel(primaryRfModel, data)
     
-	# Load the binary GBM models from cache and preserve their predictions.
+	  # Load the binary GBM models from cache and preserve their predictions.
     #gbmModels <- trainMultipleGbmModels(NULL, key, TRUE)
     #preds <- applyGbmModels(gbmModels, data, preds)
   
-	# Load the binary MaBoost models from cache and preserve their predictions.
+	  # Load the binary MaBoost models from cache and preserve their predictions.
     maBoostModels <- trainMultipleMaBoostModels(NULL, key, TRUE)
     preds <- applyMaBoostModels(maBoostModels, data, preds)
 
-	# Load the binary Random Forest models from cache and preserve their predictions.
+	  # Load the binary Random Forest models from cache and preserve their predictions.
     rfModels <- trainMultipleRfModels(NULL, key, TRUE)
     preds <- applyRfModels(rfModels, data, preds)
     
-	# Load the meta model from cache.
+	  # Load the meta model from cache.
     metaModel <- trainMetaModel(NULL, key, TRUE)
     
-	# Name the columns that contain the original RF votes.  These have numeric column names
-	# and cannot be used by some of the models.
+	  # Name the columns that contain the original RF votes.  These have numeric column names
+	  # and cannot be used by some of the models.
     colnames(preds)[1:5] <- c("x1","x2","x3","x4","x5")
 	
-	# Combine the test data and the predictions generated thus far into a single data frame,
-	# eliminating the redundant ID column.
+	  # Combine the test data and the predictions generated thus far into a single data frame,
+	  # eliminating the redundant ID column.
     preds <- cbind(preds[,-6], data)
     
     cat("  APPLYING META MODEL\n")
     col = paste("V", split, sep="")
 	
-	# Generate votes for each observation, for each split. (rows=observations, columns=splits)
+	  # Generate votes for each observation, for each split. (rows=observations, columns=splits)
     votes[, col] <- predict(metaModel, preds)
     votesOrig[, col] <- preds$pred
     votesMa[, col] <- preds$maBoostPred
@@ -1189,32 +1189,32 @@ buildMetaModels <- function(numSplits, data)
     cat(paste("\nTRAINING CROSS VALIDATION GROUP ", split, "\n", sep=""))
     cvData <- splitForCrossValidation(data, split)
     
-	# Train the primary Random Forest model, or load it from cache if available.
+	  # Train the primary Random Forest model, or load it from cache if available.
     primaryRfModel <- trainPrimaryRfModel(cvData$train, key, TRUE)
-	# Apply the model to the training data.
+	  # Apply the model to the training data.
     preds <- applyPrimaryRfModel(primaryRfModel, cvData$test)
     
-	# Train the binary GBM models, or load them from cache if available.
+	  # Train the binary GBM models, or load them from cache if available.
     #gbmModels <- trainMultipleGbmModels(cvData$train, key, TRUE)
-	# Apply the models to the training data.
+	  # Apply the models to the training data.
     #preds <- applyGbmModels(gbmModels, cvData$test, preds)
     
-	# Train the binary MaBoost models, or load them from cache if available.
+	  # Train the binary MaBoost models, or load them from cache if available.
     maBoostModels <- trainMultipleMaBoostModels(cvData$train, key, TRUE)
-	# Apply the models to the training data.
+	  # Apply the models to the training data.
     preds <- applyMaBoostModels(maBoostModels, cvData$test, preds)
     
-	# Train the binary Random Forest models, or load them from cache if available.
+	  # Train the binary Random Forest models, or load them from cache if available.
     rfModels <- trainMultipleRfModels(cvData$train, key, TRUE)
-	# Apply the models to the training data.
+	  # Apply the models to the training data.
     preds <- applyRfModels(rfModels, cvData$test, preds)
 
-	# Combine the test data and the predictions generated thus far into a single data frame,
-	# eliminating the redundant ID column.
+  	# Combine the test data and the predictions generated thus far into a single data frame,
+	  # eliminating the redundant ID column.
     preds <- cbind(preds[,-6], cvData$test)    
 
-	# Train the meta model on the resulting data frame.  The return value is not used because
-	# the function writes it to the cache.  It will be read back when needed.
+	  # Train the meta model on the resulting data frame.  The return value is not used because
+	  # the function writes it to the cache.  It will be read back when needed.
     trainMetaModel(preds, key, TRUE)
   }
 }
