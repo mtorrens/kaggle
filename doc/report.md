@@ -67,6 +67,9 @@ We used the implementation of Multinomal Logit Regression from the `nnet` packag
 #### Linear Discriminant Analysis
 We used the ‘lda’ function from the `MASS` package.  At the time, we concluded it was not successful enough, and did not record a score.
 
+#### Ensembling methods
+We tried combination of models on Random Forest. We combined different randomForests on the same data, meaning having random forests trained on different sets of the data to vote on the final test labels. Then majority votes and weighted majority votes were applied to tell the final predicted label. Its final cross-validated score was more or less as good as the final model. The code can be found in `99_ensembleRF.R`.
+
 #### Others 
 Quick investigations of packages offering Ordinal Logistic Regression, Stochastic Gradient Descent, and Logistic Regression, but did not prove sufficiently successful.
 
@@ -108,3 +111,10 @@ Ten times do the following:
 - Combine all the above predictions and probabilities and concatenate to the feature set.
 - Predict using each of the 10 Random Forest meta models.
 - For each observation, take the mode of the predictions of the meta models, and use that as our final prediction.
+
+### Advantages of the model
+- Takes into account non-linearities, outliers and time data
+
+### Pitfalls of the model
+- Over predicting twos.
+- Missing on fours and fives (too few and outlier observations)
