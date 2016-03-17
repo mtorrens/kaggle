@@ -2,7 +2,15 @@
 
 ### Data Preparation
 
-Transformation of the features was carried out by visual inspection. We had three main plots to understand the behaviour of each variable: a density plot, a bivariate plot (density for the variable for each class) and a boxplot conditional on class. This was also endorsed by a numerical summary of the variables, and a summary conditional on class. Example:
+Transformation of the features was carried out by visual inspection. We had three main plots to understand the behaviour of each variable: a density plot, a bivariate plot (density for the variable for each class) and a boxplot conditional on class.  All plots can be found in the `temp/summaries` folder on GitHub.  Here are a couple of examples:
+
+![Density](../temp/summaries/dens_LDA_02.png)
+
+![Bivariate](../temp/summaries/biv_LDA_02.png)
+
+![Box](../temp/summaries/box_LDA_02.png)
+
+These visual representations were also endorsed by a numerical summary of the variables, and a summary conditional on class.  For example:
 
 ```
 VARIABLE: timedelta 
@@ -21,7 +29,6 @@ VARIABLE: timedelta
 344.0 327.0 356.5 360.0 388.0
 ```
 
-All plots can be found in the `temp/summaries` folder.
 
 With this information we performed various transformations to the most interesting features:
 
@@ -67,9 +74,6 @@ We used the implementation of Multinomal Logit Regression from the `nnet` packag
 #### Linear Discriminant Analysis
 We used the ‘lda’ function from the `MASS` package.  At the time, we concluded it was not successful enough, and did not record a score.
 
-#### Ensembling methods
-We tried combination of models on Random Forest. We combined different randomForests on the same data, meaning having random forests trained on different sets of the data to vote on the final test labels. Then majority votes and weighted majority votes were applied to tell the final predicted label. Its final cross-validated score was more or less as good as the final model. The code can be found in `99_ensembleRF.R`.
-
 #### Others 
 Quick investigations of packages offering Ordinal Logistic Regression, Stochastic Gradient Descent, and Logistic Regression, but did not prove sufficiently successful.
 
@@ -81,36 +85,40 @@ Our investigation of Random Forest, using the `randomForest` R package proved im
 We performed tuning on hyper-parameters on our Random Forest model.  Rather than using an out-of-the-box package for tuning, we wrote a small amount of R code to do it for us.  We looped over numerous values for `ntree` (number of trees in the forest), `nodesize` (minimum number of observations in a node), `mtry` (the number of variables randomly sampled at each split), `importance` (allowing the algorithm to assess the individual importance of each feature), and `corr.bias` (experimental).  Ultimately, we only selected to explicitly set ntree and nodesize.
 
 #### Ensemble Processing
-We performed an ensemble method by “post-processing” our results from the Random Forest model described above.  This was motivated by the fact that we could evaluate the votes that came from the trees in the forest, and could see that 83% of the time, the correct classification was either the first or second choice coming out of Random Forest.  We believed that if we focused on that 83% and treated it as a binary classification problem, we had a chance of doing better than the single-stage five-class problem.
+We had initial success with ensemble processing earlier in the competition.  It earned us second place on Kaggle's public leaderboard.  However, the gains were eclipsed with simpler methods.  For the sake of posterity, the ensemble method is described here.
+
+We performed our ensemble “post-processing” upon the results from the Random Forest model described in the previous section.  This was motivated by the fact that we could evaluate the votes that came from the trees in the forest, and could see that 83% of the time, the correct classification was either the first or second choice coming out of Random Forest.  We believed that if we focused on that 83% and treated it as a binary classification problem, we had a chance of doing better than the single-stage five-class problem.
 
 In preparation for the binary classification problem, we split the training set into ten groups, those containing classes {1,2}, {1,3}, {1,4}, {1,5}, {2,3}, {2,4}, {2,5}, {3,4}, {3,5}, and {4,5}.  We then created Random Forest models for each of these pairs.  When the original model predicted a 3 as the most likely classification, and a 2 as the second most likely, we then did a subsequent predication against the {3,4} model.
 
-Given that the original Random Forest was still correct more than it was incorrect, even within the 83% where one of the top two choices is correct, we cannot look at this second stage as a tie-breaker.  We needed more information.  So we also ran a binary classification step using MaBoost.  A boosting algorithm was selected as we believed that giving greater weight to the difficult-to-classify observations could be beneficial on a dataset that seems to have a high degree of randomness built into it.  The output of all of these algorithms was then concatenated to the complete, original dataset and a final Random Forest was run.  This allowed Random Forest to consider the strengths and weaknesses of the different models, in the different classes, with respect to the values of the features.
+Given that the original Random Forest was still correct more than it was incorrect, even within the 83% where one of the top two choices is correct, we cannot look at this second stage as a tie-breaker.  We needed more information.  So we also ran a binary classification step using MaBoost.  A boosting algorithm was selected as we believed that giving greater weight to the difficult-to-classify observations could be beneficial on a dataset that seems to have a high degree of randomness built into it.  The output of all of these algorithms was then concatenated with the complete, original dataset, and a final Random Forest was run.  This allowed the Random Forest algorithm to consider the strengths and weaknesses of the different models, in the different classes, with respect to the values of the features.
 
-The full procedure above was repeated 10 times, each time with a 30% training set and a 70% test set.  The 70% test set then became the training set for the final Random Forest model.  The splits were performed in a manner such that each row was in a training set 3 times and in a test set 7 times.  The result was 10 “meta models”, each of which contributed one vote when running true predictions.
+The full procedure above was repeated 10 times, each time with a 50% training set and a 50% test set.  The 50% test set then became the training set for the final Random Forest model.  The splits were performed in a manner such that each row was in a training set 5 times and in a test set 5 times.  The result was 10 “meta models”, each of which contributed one vote when running true predictions.
 
 #### Steps for the Training Procedure
 
 - Split the data set in ten approximately equal groups randomly.
 - Ten times do the following:
-- Train a Random Forest model on three of the data groups as a single training set.
-- Test the model against the other seven data groups as a single test set.
-- Evaluate our predictions.
-- Run the appropriate binary Random Forest model and store the prediction.
-- Run the appropriate binary MaBoost model and store the prediction.
-- Run the appropriate binary GBM model and store the prediction.
-- Run a final Random Forest model on the test set (now a training set) along with the predictions, and where possible, the probabilities, from each model.
+-   Train a Random Forest model on three of the data groups as a single training set.
+-   Test the model against the other seven data groups as a single test set.
+-   Evaluate our predictions.
+-   Run the appropriate binary Random Forest model and store the prediction.
+-   Run the appropriate binary MaBoost model and store the prediction.
+-   Run the appropriate binary GBM model and store the prediction.
+- One time do the following:
+-   Run a final Random Forest model on the test set (now a training set) along with the predictions, and where possible, the probabilities, from each model.
 
 #### Steps for the Predicting Procedure
 
 Ten times do the following:
-- Predict using the 10 primary Random Forest models.
-- Predict using each of the 10 appropriate binary Random Forest models.
-- Predict using each of the 10 appropriate binary MaBoost models.
-- Predict using each of the 10 appropriate binary GBM models.
-- Combine all the above predictions and probabilities and concatenate to the feature set.
-- Predict using each of the 10 Random Forest meta models.
-- For each observation, take the mode of the predictions of the meta models, and use that as our final prediction.
+-   Predict using the 10 primary Random Forest models.
+-   Predict using each of the 10 appropriate binary Random Forest models.
+-   Predict using each of the 10 appropriate binary MaBoost models.
+-   Predict using each of the 10 appropriate binary GBM models.
+-   Combine all the above predictions and probabilities and concatenate to the feature set.
+-   Predict using each of the 10 Random Forest meta models.
+- One time do the following:
+-   For each observation, take the mode of the predictions of the meta models, and use that as our final prediction.
 
 ### Advantages of the model
 - Takes into account non-linearities, outliers and time data
