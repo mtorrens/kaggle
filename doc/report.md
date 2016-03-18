@@ -67,8 +67,9 @@ We used the implementation of a neural network from the R package `nnet` and ach
 We used the implementation of KNN from the R package `class`.  We tried a wide range of values for ‘k’.  The best that the K-Nearest Neighbors approach gave us was a cross-validated score of 47% correctness.
 
 ####Adaptive Boosting
-We used the implementation of Adaptive Boosting from the R package `maboost`.  At the time, we concluded it was not successful enough, and did not record a score.
-Multinomial Logit
+We used the implementation of Adaptive Boosting from the R package `maboost`. This method scored well, over 52%, but a bit shy of Random Forest.
+
+####Multinomial Logit
 We used the implementation of Multinomal Logit Regression from the `nnet` package.  At the time, we concluded it was not successful enough, and did not record a score.
 
 ####Linear Discriminant Analysis
